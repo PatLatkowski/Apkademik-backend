@@ -1,6 +1,8 @@
 package pl.edu.pg.apkademikbackend.WebSecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,6 +13,8 @@ import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDto;
 import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -27,7 +31,15 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-                new ArrayList<>());
+                getAuthority(user));
+    }
+
+    private Set<GrantedAuthority> getAuthority(UserDao user) {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        });
+        return authorities;
     }
 
     public UserDao save(UserDto user){
@@ -38,4 +50,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         newUser.setEmail(user.getEmail());
         return userDao.save(newUser);
     }
+
+
 }

@@ -19,10 +19,13 @@ public class Post {
     @Column
     private  LocalDateTime date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "user_id",referencedColumnName = "user_id")
     private UserDao user;
 
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "noticeBoard_id",referencedColumnName = "noticeBoard_id")
+    private NoticeBoard noticeBoard;
 
     public long getId(){
         return id;
@@ -59,4 +62,10 @@ public class Post {
         this.user=user;
     }
 
+    public NoticeBoard getNoticeBoard(){
+        return noticeBoard;
+    }
+    public void setNoticeBoard(NoticeBoard noticeBoard){
+        this.noticeBoard=noticeBoard;
+    }
 }

@@ -1,13 +1,24 @@
 package pl.edu.pg.apkademikbackend.WebSecurity.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
+import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.NoticeBoardNotFoundException;
+import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.PostNotFoundException;
+import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.PostNotOnThisNoticeBoardException;
+import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.UserNotFoundException;
+import pl.edu.pg.apkademikbackend.WebSecurity.model.NoticeBoard;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Post;
+import pl.edu.pg.apkademikbackend.WebSecurity.model.PostDto;
+import pl.edu.pg.apkademikbackend.WebSecurity.repository.NoticeBoardRepository;
 import pl.edu.pg.apkademikbackend.WebSecurity.repository.PostRepository;
 import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -19,24 +30,76 @@ public class PostController {
     @Autowired
     PostRepository postRepository;
 
-    @PostMapping("/addPost")
-    public ResponseEntity<?> addPost(@RequestBody Post newPost) throws Exception{
+    @Autowired
+    NoticeBoardRepository noticeBoardRepository;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @PostMapping("/{noticeBoard}/addPost")
+    public ResponseEntity<?> addPost(@PathVariable String noticeBoard,@RequestBody Post newPost,HttpServletRequest request) throws Exception{
         LocalDateTime date=LocalDateTime.now();
         newPost.setDate(date);
+
+        final String requestTokenHeader = request.getHeader("Authorization");
+
+        String user = null;
+        String jwtToken = null;
+
+        jwtToken = requestTokenHeader.substring(7);
+        try {
+            user = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
+        }
+        newPost.setUser(userRepository.findByEmail(user));
+
+
+        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        if(testNoticeBoard == null)
+            throw new NoticeBoardNotFoundException(noticeBoard);
+
+        newPost.setNoticeBoard(testNoticeBoard);
+
         return ResponseEntity.ok(postRepository.save(newPost));
     }
 
-    @GetMapping("/posts")
-    public ResponseEntity<?> findAllPosts() {
+    @GetMapping("/{noticeBoard}/posts")
+    public ResponseEntity<?> findAllPosts(@PathVariable String noticeBoard)  throws Exception{
+        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        if(testNoticeBoard == null)
+            throw new NoticeBoardNotFoundException(noticeBoard);
 
-        return ResponseEntity.ok(postRepository.findAll());
+
+        Iterable<Post> posts=postRepository.findAllByDate(testNoticeBoard.getId());
+        List<PostDto> postsData=new ArrayList<PostDto>();
+        for (Post post:posts ) {
+            postsData.add(new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getFullName()) );
+        }
+
+        return ResponseEntity.ok(postsData);
     }
 
-    @GetMapping("/post/{id}")
-    public ResponseEntity<?> findPost(@PathVariable String id) {
+    @GetMapping("/{noticeBoard}/post/{id}")
+    public ResponseEntity<?> findPost(@PathVariable String id,@PathVariable String noticeBoard)  throws Exception{
 
-        return ResponseEntity.ok(postRepository.findById(Integer.parseInt(id)));
+        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        if(testNoticeBoard == null)
+            throw new NoticeBoardNotFoundException(noticeBoard);
+
+        Post post=postRepository.findById(Integer.parseInt(id));
+        if(post==null)
+            throw new PostNotFoundException(id);
+
+
+        if(post.getNoticeBoard().getId()!=testNoticeBoard.getId())
+            throw new PostNotOnThisNoticeBoardException(id,noticeBoard);
+
+        PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getFullName());
+
+        return ResponseEntity.ok(postDto);
     }
-
 
 }

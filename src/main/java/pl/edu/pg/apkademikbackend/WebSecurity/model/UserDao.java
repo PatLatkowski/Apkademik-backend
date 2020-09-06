@@ -3,6 +3,8 @@ package pl.edu.pg.apkademikbackend.WebSecurity.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,6 +13,7 @@ public class UserDao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_id")
     private long id;
     @Column
     @JsonIgnore

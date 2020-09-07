@@ -26,11 +26,6 @@ public class TestController {
         return "Server is on!!!";
     }
 
-    @GetMapping("/user/{email}")
-    public UserDao getUser(@PathVariable String email){
-        return userRepository.findByEmail(email);
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/server/test/admin")
     public String adminCheck(){

@@ -1,13 +1,10 @@
 package pl.edu.pg.apkademikbackend.WebSecurity.model;
 
-import javax.persistence.Column;
-
 public class UserDto {
     private String password;
     private String name;
-    private String fullName;
+    private String surname;
     private String email;
-    private String role;
 
     public String getPassword() {
         return password;
@@ -25,12 +22,12 @@ public class UserDto {
         this.name = name;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getEmail() {
@@ -39,13 +36,5 @@ public class UserDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

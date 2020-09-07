@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class SecuredControllerWebMvcIntegrationTest {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mvc;
 
     @Autowired
@@ -35,7 +35,7 @@ public class SecuredControllerWebMvcIntegrationTest {
     @Test
     public void shouldPassAuthentication() throws Exception{
         mvc.perform(MockMvcRequestBuilders.post("/authenticate").contentType(MediaType.APPLICATION_JSON)
-        .content("{ \"email\" : \""+email+"\" , \"password\" : \""+password+"\"}")).andExpect(status().isOk());
+                .content("{ \"email\" : \""+email+"\" , \"password\" : \""+password+"\"}")).andExpect(status().isOk());
     }
 
     @Test
@@ -52,5 +52,5 @@ public class SecuredControllerWebMvcIntegrationTest {
 
         assertNotNull(token);
         mvc.perform(MockMvcRequestBuilders.get("/greeting").header("Authorization","Bearer " + token)).andExpect(status().isOk());
-    }
+    }*/
 }

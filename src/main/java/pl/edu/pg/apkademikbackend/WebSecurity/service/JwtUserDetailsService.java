@@ -5,14 +5,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDao;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDto;
 import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,10 +24,10 @@ public class JwtUserDetailsService implements UserDetailsService {
     private PasswordEncoder bcryptEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UserNotFoundException {
         UserDao user = userDao.findByEmail(email);
         if(user == null){
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UserNotFoundException(email);
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 getAuthority(user));
@@ -46,9 +45,21 @@ public class JwtUserDetailsService implements UserDetailsService {
         UserDao newUser = new UserDao();
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
         newUser.setName(user.getName());
-        newUser.setFullName(user.getFullName());
+        newUser.setSurname(user.getSurname());
         newUser.setEmail(user.getEmail());
         return userDao.save(newUser);
+    }
+
+    public UserDao save(UserDto user, String email){
+        UserDao updatedUser = userDao.findByEmail(email);
+        if(updatedUser == null){
+            throw new UserNotFoundException(email);
+        }
+        updatedUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+        updatedUser.setName(user.getName());
+        updatedUser.setSurname(user.getSurname());
+        updatedUser.setEmail(user.getEmail());
+        return userDao.save(updatedUser);
     }
 
 

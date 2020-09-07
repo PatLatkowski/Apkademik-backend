@@ -1,8 +1,11 @@
 package pl.edu.pg.apkademikbackend.WebSecurity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.model.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,7 +21,7 @@ public class UserDao {
     @Column
     private String name;
     @Column
-    private String fullName;
+    private String surname;
     @Column
     private String email;
 
@@ -26,7 +29,41 @@ public class UserDao {
     @JoinTable(name = "USER_ROLES", joinColumns = {
             @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
             @JoinColumn(name = "ROLE_ID") })
+    @JsonIgnore
     private Set<Role> roles;
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<WashingReservation> washingReservations  = new ArrayList<>();
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<CommonSpaceReservation> commonSpaceReservations = new ArrayList<>();
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<Post> posts  = new ArrayList<>();
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
+
 
     public long getId() {
         return id;
@@ -52,12 +89,12 @@ public class UserDao {
         this.name = name;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setSurname(String fullName) {
+        this.surname = fullName;
     }
 
     public String getEmail() {
@@ -74,5 +111,37 @@ public class UserDao {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<WashingReservation> getWashingReservations() {
+        return washingReservations;
+    }
+
+    public void setWashingReservations(List<WashingReservation> washingReservations) {
+        this.washingReservations = washingReservations;
+    }
+
+    public List<CommonSpaceReservation> getCommonSpaceReservations() {
+        return commonSpaceReservations;
+    }
+
+    public void setCommonSpaceReservations(List<CommonSpaceReservation> commonSpaceReservations) {
+        this.commonSpaceReservations = commonSpaceReservations;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

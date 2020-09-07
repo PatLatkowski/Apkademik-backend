@@ -14,6 +14,7 @@ public class UserDao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_id")
     private long id;
     @Column
     @JsonIgnore

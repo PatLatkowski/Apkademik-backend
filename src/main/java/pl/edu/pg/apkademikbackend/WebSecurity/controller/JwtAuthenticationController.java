@@ -7,18 +7,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
-import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.UserAlreadyExistException;
+import pl.edu.pg.apkademikbackend.user.exception.UserAlreadyExistException;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.JwtRequest;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.JwtResponse;
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDao;
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDto;
-import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
+import pl.edu.pg.apkademikbackend.user.model.UserDto;
+import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 import pl.edu.pg.apkademikbackend.WebSecurity.service.JwtUserDetailsService;
-
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*")

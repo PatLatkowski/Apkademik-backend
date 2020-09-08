@@ -1,6 +1,6 @@
 package pl.edu.pg.apkademikbackend.model;
 
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDao;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import javax.persistence.*;
 import java.util.ArrayList;

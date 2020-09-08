@@ -6,11 +6,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.RoleAlreadyExistException;
 import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.RoleNotFoundException;
-import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.UserNotFoundException;
+import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDao;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.WebSecurity.repository.RoleRepository;
-import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
+import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import java.util.Set;
 

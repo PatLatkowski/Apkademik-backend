@@ -7,10 +7,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.UserNotFoundException;
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDao;
-import pl.edu.pg.apkademikbackend.WebSecurity.model.UserDto;
-import pl.edu.pg.apkademikbackend.WebSecurity.repository.UserRepository;
+import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
+import pl.edu.pg.apkademikbackend.user.model.UserDto;
+import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import java.util.HashSet;
 import java.util.Set;

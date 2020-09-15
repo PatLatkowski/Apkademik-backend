@@ -15,7 +15,7 @@ public class Room {
     @Column(name="room_id")
     private long id;
     @Column
-    private String number;
+    private Integer number;
     @Column
     private int size;
     @OneToMany(
@@ -34,11 +34,11 @@ public class Room {
         this.id = id;
     }
 
-    public String getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
 

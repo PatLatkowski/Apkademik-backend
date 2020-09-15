@@ -8,10 +8,10 @@ public class PostDto {
     private  String text;
     private LocalDateTime date;
     private  String author;
-    private String room;
+    private Integer room;
     private boolean isAuthor;
 
-    public PostDto(Long id, String title,String text,LocalDateTime date,String authorName,String authorSurname,String room){
+    public PostDto(Long id, String title,String text,LocalDateTime date,String authorName,String authorSurname,Integer room){
         this.id=id;
         this.title=title;
         this.text=text;
@@ -56,10 +56,10 @@ public class PostDto {
         this.author=author;
     }
 
-    public String getRoom(){
+    public Integer getRoom(){
         return room;
     }
-    public void setRoom(String room){
+    public void setRoom(Integer room){
         this.room=room;
     }
 

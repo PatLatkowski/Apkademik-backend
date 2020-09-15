@@ -5,6 +5,8 @@ public class UserDto {
     private String name;
     private String surname;
     private String email;
+    private Long roomId;
+    private Long dormId;
 
     public String getPassword() {
         return password;
@@ -36,5 +38,21 @@ public class UserDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public Long getDormId() {
+        return dormId;
+    }
+
+    public void setDormId(Long dormId) {
+        this.dormId = dormId;
     }
 }

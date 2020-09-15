@@ -47,12 +47,9 @@ public class JwtAuthenticationController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> saveUser(@RequestBody UserDto user) throws Exception {
-
         UserDao userToCheck = userDao.findByEmail(user.getEmail());
-        if(userToCheck != null){
+        if(userToCheck != null)
             throw new UserAlreadyExistException(user.getEmail());
-        }
-
         return ResponseEntity.ok(userDetailsService.save(user));
     }
 

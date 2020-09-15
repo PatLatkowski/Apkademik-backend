@@ -1,13 +1,9 @@
 package pl.edu.pg.apkademikbackend.user.controller;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
-import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
-import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.model.UserDto;
 import pl.edu.pg.apkademikbackend.user.model.UserToAuthorize;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
@@ -25,41 +21,15 @@ public class UserController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/{email}")
     public ResponseEntity<?> getUser(@PathVariable String email){
-
-        UserDao user = userRepository.findByEmail(email);
-        if(user == null){
-            throw new UserNotFoundException(email);
-        }
-
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userDetailsService.getUser(email));
     }
     @GetMapping("/user")
     public ResponseEntity<?> getUser(HttpServletRequest request){
-        final String requestTokenHeader = request.getHeader("Authorization");
-        String jwtToken = null;
-        String userName = null;
-        jwtToken = requestTokenHeader.substring(7);
-        try {
-            userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Unable to get JWT Token");
-        } catch (ExpiredJwtException e) {
-            System.out.println("JWT Token has expired");
-        }
-
-        UserDao user = userRepository.findByEmail(userName);
-
-        if(user == null){
-            throw new UserNotFoundException(userName);
-        }
-
-        return ResponseEntity.ok(user);
+        String userEmail = userDetailsService.getUserEmailFromToken(request);
+        return ResponseEntity.ok(userDetailsService.getUser(userEmail));
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user/{email}")
@@ -69,19 +39,8 @@ public class UserController {
 
     @PutMapping("/user")
     public ResponseEntity<?> updateUser(@RequestBody UserToAuthorize user, HttpServletRequest request){
-        final String requestTokenHeader = request.getHeader("Authorization");
-        String jwtToken = null;
-        String userName = null;
-        jwtToken = requestTokenHeader.substring(7);
-        try {
-            userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Unable to get JWT Token");
-        } catch (ExpiredJwtException e) {
-            System.out.println("JWT Token has expired");
-        }
-
-        return ResponseEntity.ok(userDetailsService.save(user.getUser(),userName,user.getOldPassword()));
+        String userEmail = userDetailsService.getUserEmailFromToken(request);
+        return ResponseEntity.ok(userDetailsService.save(user.getUser(),userEmail,user.getOldPassword()));
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/user/{email}")
@@ -92,18 +51,13 @@ public class UserController {
 
     @DeleteMapping("/user")
     public ResponseEntity<?> deleteUser(HttpServletRequest request){
-        final String requestTokenHeader = request.getHeader("Authorization");
-        String jwtToken = null;
-        String userName = null;
-        jwtToken = requestTokenHeader.substring(7);
-        try {
-            userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Unable to get JWT Token");
-        } catch (ExpiredJwtException e) {
-            System.out.println("JWT Token has expired");
-        }
-        userRepository.deleteByEmail(userName);
+        String userEmail = userDetailsService.getUserEmailFromToken(request);
+        userRepository.deleteByEmail(userEmail);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable long id){
+        return ResponseEntity.ok(userDetailsService.getUser(id));
     }
 }

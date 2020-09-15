@@ -36,6 +36,13 @@ public class RoomService {
                 .orElseThrow(() -> new RoomNotFoundException(roomNumber));
     }
 
+    public Room getRoom(long id){
+        Room room = roomRepository.findById(id);
+        if(room==null)
+            throw new RoomNotFoundException(id);
+        return room;
+    }
+
     public Room saveRoom(String dormName, Integer floorNumber, Room room){
         Floor floor = floorService.getFloor(dormName,floorNumber);
         List<Room> rooms = floor.getRooms();
@@ -57,4 +64,33 @@ public class RoomService {
         userRepository.save(user);
         return room.getResidents();
     }
+
+    public Room updateRoom(long id, Room updatedRoom){
+        Room room = this.getRoom(id);
+        if(updatedRoom.getNumber()!=0)
+            room.setNumber(updatedRoom.getNumber());
+        if(updatedRoom.getSize()!=0)
+            room.setSize(updatedRoom.getSize());
+        if(updatedRoom.getResidents()!=null)
+            room.setResidents(updatedRoom.getResidents());
+        return room;
+    }
+
+    public void deleteRoom(long id){
+        Room room = this.getRoom(id);
+        roomRepository.delete(room);
+    }
+
+    public List<Room> getAllRoomsFromFloor(long id){
+        return floorService.getFloor(id).getRooms();
+    }
+
+    public Room getRoomFromUserEmail(String userEmail){
+        return this.getRoom(userRepository.findByEmail(userEmail).getRoom().getId());
+    }
+
+    public List<UserDao> getUsersFromRoom(long id){
+        return this.getRoom(id).getResidents();
+    }
+
 }

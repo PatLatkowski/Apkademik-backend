@@ -42,6 +42,21 @@ public class RolesController {
         return ResponseEntity.ok(roleRepository.save(newRole));
     }
 
+    @GetMapping("/roles")
+    public ResponseEntity<?> getRoles(){
+        return ResponseEntity.ok(roleRepository.findAll());
+    }
+
+    @PostMapping("/user/{userId}/role/{roleId}")
+    public ResponseEntity<?> setRoleToUser(@PathVariable long userId, @PathVariable long roleId){
+        Role role = roleRepository.findById(roleId);
+        UserDao user = userRepository.findById(userId);
+        Set<Role> newRoles = user.getRoles();
+        newRoles.add(role);
+        user.setRoles(newRoles);
+        return ResponseEntity.ok(userRepository.save(user));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/user/{email}/role/{roleName}")
     public ResponseEntity<?> connectUserAndRole(@PathVariable String email, @PathVariable String roleName) throws Exception{
@@ -59,6 +74,11 @@ public class RolesController {
         user.setRoles(newRoles);
 
         return ResponseEntity.ok(newRoles);
+    }
+
+    @GetMapping("/user/{userId}/roles")
+    public ResponseEntity<?> getUserRoles(@PathVariable long userId){
+        return ResponseEntity.ok(userRepository.findById(userId).getRoles());
     }
 
 }

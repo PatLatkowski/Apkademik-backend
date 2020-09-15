@@ -1,5 +1,6 @@
 package pl.edu.pg.apkademikbackend.user;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -7,12 +8,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
 import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.InvalidPasswordException;
+import pl.edu.pg.apkademikbackend.dorm.DormService;
+import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.model.UserDto;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +28,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private DormService dormService;
+
+    @Autowired
+    private RoomService roomService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UserNotFoundException {
@@ -72,6 +89,38 @@ public class JwtUserDetailsService implements UserDetailsService {
             updatedUser.setSurname(user.getSurname());
         if(user.getEmail()!=null)
             updatedUser.setEmail(user.getEmail());
+        if(user.getDormId()!=null)
+            updatedUser.setDorm(dormService.getDormById(user.getDormId()));
+        if(user.getRoomId()!=null)
+            roomService.getRoom(user.getRoomId()).addResident(updatedUser);
         return userDao.save(updatedUser);
+    }
+    public String getUserEmailFromToken(HttpServletRequest request ){
+        final String requestTokenHeader = request.getHeader("Authorization");
+        String jwtToken = null;
+        String userEmail = null;
+        jwtToken = requestTokenHeader.substring(7);
+        try {
+            userEmail = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
+        }
+        return userEmail;
+    }
+
+    public UserDao getUser(String email){
+        UserDao user = userRepository.findByEmail(email);
+        if(user == null){
+            throw new UserNotFoundException(email);
+        }
+        return user;
+    }
+    public UserDao getUser(long id){
+        UserDao user = userRepository.findById(id);
+        if(user == null)
+            throw new UserNotFoundException("sadsa");
+        return user;
     }
 }

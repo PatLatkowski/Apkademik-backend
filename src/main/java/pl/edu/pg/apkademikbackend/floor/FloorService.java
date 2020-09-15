@@ -30,6 +30,13 @@ public class FloorService {
                 .orElseThrow(() -> new FloorNotFoundException(floorNumber));
     }
 
+    public Floor getFloor(long id){
+        Floor floor = floorRepository.findById(id);
+        if(floor==null)
+            throw new FloorNotFoundException(id);
+        return floor;
+    }
+
     public List<Floor> saveFloor(String dormName, Floor floor){
         Dorm dorm = dormService.getDorm(dormName);
         List<Floor> floors = dorm.getFloors();
@@ -42,5 +49,21 @@ public class FloorService {
         dorm.setFloors(floors);
         floorRepository.save(floor);
         return floors;
+    }
+
+    public Floor updateFloor(long id, Floor updatedFloor){
+        Floor floor = this.getFloor(id);
+        if(updatedFloor.getNumber()!=0)
+            floor.setNumber(updatedFloor.getNumber());
+        return floor;
+    }
+
+    public void deleteFloor(long id){
+        Floor floor = this.getFloor(id);
+        floorRepository.delete(floor);
+    }
+
+    public List<Floor> getAllFloorsFromDorm(long id){
+        return dormService.getDormById(id).getFloors();
     }
 }

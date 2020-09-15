@@ -2,6 +2,7 @@ package pl.edu.pg.apkademikbackend.dorm.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ public class Dorm {
     private String address;
     @Column
     private int floorCount;
-
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true
@@ -27,6 +27,13 @@ public class Dorm {
     @JoinColumn(name = "dorm_id")
     @JsonIgnore
     private List<Floor> floors = new ArrayList<>();
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "dorm_id")
+    @JsonIgnore
+    private List<NoticeBoard> noticeBoards  = new ArrayList<>();
 
     public long getId() {
         return id;
@@ -66,5 +73,13 @@ public class Dorm {
 
     public void setFloors(List<Floor> floors) {
         this.floors = floors;
+    }
+
+    public List<NoticeBoard> getNoticeBoards() {
+        return noticeBoards;
+    }
+
+    public void setNoticeBoards(List<NoticeBoard> noticeBoards) {
+        this.noticeBoards = noticeBoards;
     }
 }

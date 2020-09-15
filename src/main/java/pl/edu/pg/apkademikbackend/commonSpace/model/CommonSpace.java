@@ -1,4 +1,8 @@
-package pl.edu.pg.apkademikbackend.model;
+package pl.edu.pg.apkademikbackend.commonSpace.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,14 +20,19 @@ public class CommonSpace {
     private int size;
     @Column
     private String name;
+    @Column
+    private CommonSpaceType type;
 
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @JoinColumn(name = "common_space_id")
+    @JsonIgnore
     private List<WashingMachine> washingMachines  = new ArrayList<>();
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Floor floor;
 
     public long getId() {
         return id;
@@ -63,5 +72,21 @@ public class CommonSpace {
 
     public void setWashingMachines(List<WashingMachine> washingMachines) {
         this.washingMachines = washingMachines;
+    }
+
+    public CommonSpaceType getType() {
+        return type;
+    }
+
+    public void setType(CommonSpaceType type) {
+        this.type = type;
+    }
+
+    public Floor getFloor() {
+        return floor;
+    }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
     }
 }

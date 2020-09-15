@@ -1,5 +1,6 @@
-package pl.edu.pg.apkademikbackend.model;
+package pl.edu.pg.apkademikbackend.room.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class Room {
             orphanRemoval = true
     )
     @JoinColumn(name = "room_id")
+    @JsonIgnore
     private List<UserDao> residents = new ArrayList<>();
 
     public long getId() {
@@ -53,5 +55,15 @@ public class Room {
 
     public void setResidents(List<UserDao> residents) {
         this.residents = residents;
+    }
+
+    public void addResident(UserDao user){
+        residents.add(user);
+        user.setRoom(this);
+    }
+
+    public void removeResident(UserDao user){
+        residents.remove(user);
+        user.setRoom(null);
     }
 }

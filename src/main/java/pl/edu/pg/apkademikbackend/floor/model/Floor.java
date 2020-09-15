@@ -1,4 +1,8 @@
-package pl.edu.pg.apkademikbackend.model;
+package pl.edu.pg.apkademikbackend.floor.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
+import pl.edu.pg.apkademikbackend.room.model.Room;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,12 +21,14 @@ public class Floor {
             orphanRemoval = true
     )
     @JoinColumn(name = "floor_id")
+    @JsonIgnore
     private List<Room> rooms = new ArrayList<>();
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @JoinColumn(name = "floor_id")
+    @JsonIgnore
     private List<CommonSpace> commonSpaces = new ArrayList<>();
 
     public long getId() {
@@ -55,5 +61,15 @@ public class Floor {
 
     public void setCommonSpaces(List<CommonSpace> commonSpaces) {
         this.commonSpaces = commonSpaces;
+    }
+
+    public void addCommonSpace(CommonSpace commonSpace){
+        commonSpaces.add(commonSpace);
+        commonSpace.setFloor(this);
+    }
+
+    public void removeCommonSpace(CommonSpace commonSpace){
+        commonSpaces.remove(commonSpace);
+        commonSpace.setFloor(null);
     }
 }

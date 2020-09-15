@@ -9,8 +9,9 @@ import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
 import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.model.UserDto;
+import pl.edu.pg.apkademikbackend.user.model.UserToAuthorize;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
-import pl.edu.pg.apkademikbackend.WebSecurity.service.JwtUserDetailsService;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -67,7 +68,7 @@ public class UserController {
     }
 
     @PutMapping("/user")
-    public ResponseEntity<?> updateUser(@RequestBody UserDto user, HttpServletRequest request){
+    public ResponseEntity<?> updateUser(@RequestBody UserToAuthorize user, HttpServletRequest request){
         final String requestTokenHeader = request.getHeader("Authorization");
         String jwtToken = null;
         String userName = null;
@@ -79,7 +80,8 @@ public class UserController {
         } catch (ExpiredJwtException e) {
             System.out.println("JWT Token has expired");
         }
-        return ResponseEntity.ok(userDetailsService.save(user,userName));
+
+        return ResponseEntity.ok(userDetailsService.save(user.getUser(),userName,user.getOldPassword()));
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/user/{email}")

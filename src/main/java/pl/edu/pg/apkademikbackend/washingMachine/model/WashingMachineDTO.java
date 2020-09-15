@@ -1,32 +1,19 @@
-package pl.edu.pg.apkademikbackend.model;
+package pl.edu.pg.apkademikbackend.washingMachine.model;
 
-import javax.persistence.*;
+import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name="washing_machine")
-public class WashingMachine {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column
+public class WashingMachineDTO {
     private int number;
-    @Column
     private WashingMachineStatus status;
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JoinColumn(name = "washing_machine_id")
     private List<WashingReservation> washingReservations = new ArrayList<>();
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public WashingMachineDTO(int number, WashingMachineStatus status, List<WashingReservation> washingReservations) {
+        this.number = number;
+        this.status = status;
+        this.washingReservations = washingReservations;
     }
 
     public int getNumber() {

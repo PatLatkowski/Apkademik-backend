@@ -1,4 +1,4 @@
 package pl.edu.pg.apkademikbackend.model;
 
-public enum WashingMachineStatus {
+public interface Reservation {
 }

@@ -11,9 +11,6 @@ import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 @CrossOrigin(origins = "*")
 public class TestController {
 
-    @Autowired
-    private UserRepository userRepository;
-
     @GetMapping("/greeting")
     public String welcomePage() {
         return "Welcome!";

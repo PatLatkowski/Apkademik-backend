@@ -6,7 +6,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name="common_space_reservation")
-public class CommonSpaceReservation {
+public class CommonSpaceReservation implements Reservation{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

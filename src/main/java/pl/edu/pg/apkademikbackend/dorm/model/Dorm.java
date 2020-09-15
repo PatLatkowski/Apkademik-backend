@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.dorm.model;
 
-import pl.edu.pg.apkademikbackend.model.Floor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.floor.model.Floor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class Dorm {
             orphanRemoval = true
     )
     @JoinColumn(name = "dorm_id")
+    @JsonIgnore
     private List<Floor> floors = new ArrayList<>();
 
     public long getId() {

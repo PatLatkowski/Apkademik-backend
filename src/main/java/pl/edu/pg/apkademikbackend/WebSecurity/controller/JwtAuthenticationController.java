@@ -15,7 +15,7 @@ import pl.edu.pg.apkademikbackend.WebSecurity.model.JwtResponse;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.model.UserDto;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
-import pl.edu.pg.apkademikbackend.WebSecurity.service.JwtUserDetailsService;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
 @RestController
 @CrossOrigin(origins = "*")

@@ -65,7 +65,7 @@ public class PostController {
         return ResponseEntity.ok(postRepository.save(newPost));
     }
 
-    @GetMapping("//noticeBoard{noticeBoard}/posts")
+    @GetMapping("/noticeBoard/{noticeBoard}/posts")
     public ResponseEntity<?> getAllPosts(@PathVariable String noticeBoard)  throws Exception{
         NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
         if(testNoticeBoard == null)
@@ -75,14 +75,15 @@ public class PostController {
         Iterable<Post> posts=postRepository.findAllByDate(testNoticeBoard.getId());
         List<PostDto> postsData=new ArrayList<PostDto>();
         for (Post post:posts ) {
-            postsData.add(new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getSurname()) );
+            PostDto newPostDto= returnPostData(post);
+            postsData.add(newPostDto);
         }
 
         return ResponseEntity.ok(postsData);
     }
 
     @GetMapping("/noticeBoard/{noticeBoard}/post/{id}")
-    public ResponseEntity<?> getPost(@PathVariable String id,@PathVariable String noticeBoard)  throws Exception{
+    public ResponseEntity<?> getPost(@PathVariable String id,@PathVariable String noticeBoard,HttpServletRequest request)  throws Exception{
 
         NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
         if(testNoticeBoard == null)
@@ -96,9 +97,44 @@ public class PostController {
         if(post.getNoticeBoard().getId()!=testNoticeBoard.getId())
             throw new PostNotOnThisNoticeBoardException(id,noticeBoard);
 
-        PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getSurname());
+        PostDto postDto=returnPostData(post);
 
+
+        final String requestTokenHeader = request.getHeader("Authorization");
+
+        String user = null;
+        String jwtToken = null;
+
+        jwtToken = requestTokenHeader.substring(7);
+        try {
+            user = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
+        }
+
+        if(post.getUsers()==userRepository.findByEmail(user))
+            postDto.setIsAuthor(true);
         return ResponseEntity.ok(postDto);
     }
 
+    @PatchMapping("/post/{id}")
+    public ResponseEntity<?> updatePost(@PathVariable String id,@RequestBody Post newPost)  throws Exception{
+
+        Post post=postRepository.findById(Integer.parseInt(id));
+        if(post==null)
+            throw new PostNotFoundException(id);
+
+        post.setText(newPost.getText());
+        postRepository.save(post);
+
+        return ResponseEntity.ok(returnPostData(post));
+    }
+
+
+    public PostDto returnPostData(Post post){
+        PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getSurname(),post.getUsers().getRoom().getNumber());
+        return postDto;
+    }
 }

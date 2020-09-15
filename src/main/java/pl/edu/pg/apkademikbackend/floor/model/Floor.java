@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
 import pl.edu.pg.apkademikbackend.room.model.Room;
 
+import pl.edu.pg.apkademikbackend.room.model.Room;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

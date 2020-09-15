@@ -12,9 +12,10 @@ import java.util.List;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="room_id")
     private long id;
     @Column
-    private int number;
+    private String number;
     @Column
     private int size;
     @OneToMany(
@@ -33,11 +34,11 @@ public class Room {
         this.id = id;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

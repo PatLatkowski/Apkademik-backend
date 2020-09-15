@@ -1,5 +1,6 @@
-package pl.edu.pg.apkademikbackend.model;
+package pl.edu.pg.apkademikbackend.room.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import javax.persistence.*;
@@ -11,9 +12,10 @@ import java.util.List;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="room_id")
     private long id;
     @Column
-    private int number;
+    private String number;
     @Column
     private int size;
     @OneToMany(
@@ -21,6 +23,7 @@ public class Room {
             orphanRemoval = true
     )
     @JoinColumn(name = "room_id")
+    @JsonIgnore
     private List<UserDao> residents = new ArrayList<>();
 
     public long getId() {
@@ -31,11 +34,11 @@ public class Room {
         this.id = id;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

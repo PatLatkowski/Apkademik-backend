@@ -1,5 +1,6 @@
 package pl.edu.pg.apkademikbackend.model;
 
+import pl.edu.pg.apkademikbackend.room.model.Room;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

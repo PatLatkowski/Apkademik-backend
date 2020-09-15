@@ -3,6 +3,7 @@ package pl.edu.pg.apkademikbackend.user.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
 import pl.edu.pg.apkademikbackend.model.*;
+import pl.edu.pg.apkademikbackend.room.model.Room;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -49,6 +50,10 @@ public class UserDao {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private List<CommonSpaceReservation> commonSpaceReservations = new ArrayList<>();
+
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "room_id",referencedColumnName = "room_id")
+    private Room room;
 
 
     public long getId() {
@@ -113,5 +118,13 @@ public class UserDao {
 
     public void setCommonSpaceReservations(List<CommonSpaceReservation> commonSpaceReservations) {
         this.commonSpaceReservations = commonSpaceReservations;
+    }
+
+    public Room getRoom(){
+        return room;
+    }
+
+    public void setRoom(Room room){
+        this.room=room;
     }
 }

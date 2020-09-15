@@ -1,23 +1,21 @@
-package pl.edu.pg.apkademikbackend.post.model;
+package pl.edu.pg.apkademikbackend.comment.model;
+
 
 import java.time.LocalDateTime;
 
-public class PostDto {
+public class CommentDto {
+
     private long id;
-    private  String title;
     private  String text;
     private LocalDateTime date;
     private  String author;
-    private String room;
     private boolean isAuthor;
 
-    public PostDto(Long id, String title,String text,LocalDateTime date,String authorName,String authorSurname,String room){
+    public CommentDto(Long id, String text,LocalDateTime date,String authorName,String authorSurname){
         this.id=id;
-        this.title=title;
         this.text=text;
         this.date=date;
         this.author=authorName+" "+authorSurname;
-        this.room=room;
         this.isAuthor=false;
     }
 
@@ -26,13 +24,6 @@ public class PostDto {
     }
     public void setId(long id){
         this.id=id;
-    }
-
-    public String getTitle(){
-        return title;
-    }
-    public void setTitle(String title){
-        this.title=title;
     }
 
     public String getText(){
@@ -55,15 +46,8 @@ public class PostDto {
     public void setAuthor(String author){
         this.author=author;
     }
-
-    public String getRoom(){
-        return room;
-    }
-    public void setRoom(String room){
-        this.room=room;
-    }
-
     public boolean getIsAuthor(){return isAuthor;}
 
     public void setIsAuthor(boolean isAuthor){this.isAuthor=isAuthor;}
 }
+

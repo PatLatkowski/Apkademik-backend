@@ -14,6 +14,7 @@ import pl.edu.pg.apkademikbackend.washingMachine.WashingMachineService;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDTO;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationCollideException;
+import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationNotFoundException;
 import pl.edu.pg.apkademikbackend.washingReservation.model.DateAndStartingHours;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 import pl.edu.pg.apkademikbackend.washingReservation.repository.WashingReservationRepository;
@@ -149,4 +150,35 @@ public class WashingReservationService {
     private boolean isWithinTwoDays(LocalDate testDate, LocalDate dateToCompare) {
         return testDate.isAfter(dateToCompare.minus(2, ChronoUnit.DAYS)) && dateToCompare.isBefore(testDate.plus(2,ChronoUnit.DAYS));
     }
+
+
+    public WashingReservation getWashingReservationById(long id){
+        WashingReservation washingReservation = washingReservationRepository.findById(id);
+        if(washingReservation == null)
+            throw new WashingReservationNotFoundException(id);
+        return washingReservation;
+    }
+
+    public WashingReservation updateWashingReservationById(long id, WashingReservation newWashingReservation){
+        WashingReservation washingReservation = washingReservationRepository.findById(id);
+        if(washingReservation == null)
+            throw new WashingReservationNotFoundException(id);
+        if(newWashingReservation.getStatus()!=null)
+            washingReservation.setStatus(newWashingReservation.getStatus());
+        if(newWashingReservation.getStart()!=null)
+            washingReservation.setStart(newWashingReservation.getStart());
+        if(newWashingReservation.getEnd()!=null)
+            washingReservation.setEnd(newWashingReservation.getEnd());
+        if(newWashingReservation.getDate()!=null)
+            washingReservation.setDate(newWashingReservation.getDate());
+        return washingReservationRepository.save(washingReservation);
+    }
+
+    public void deleteWashingReservationById(long id){
+        WashingReservation washingReservation =washingReservationRepository.findById(id);
+        if(washingReservation == null)
+            throw new  WashingReservationNotFoundException(id);
+        washingReservationRepository.delete(washingReservation);
+    }
+
 }

@@ -6,18 +6,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
 import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardNotFoundException;
+import pl.edu.pg.apkademikbackend.post.PostService;
 import pl.edu.pg.apkademikbackend.post.exception.PostNotFoundException;
 import pl.edu.pg.apkademikbackend.post.exception.PostNotOnThisNoticeBoardException;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 import pl.edu.pg.apkademikbackend.post.model.Post;
-import pl.edu.pg.apkademikbackend.post.model.PostDto;
 import pl.edu.pg.apkademikbackend.noticeboard.repository.NoticeBoardRepository;
+import pl.edu.pg.apkademikbackend.post.model.PostDto;
 import pl.edu.pg.apkademikbackend.post.repository.PostRepository;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -28,6 +30,9 @@ public class PostController {
 
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    PostService postService;
 
     @Autowired
     NoticeBoardRepository noticeBoardRepository;
@@ -83,13 +88,13 @@ public class PostController {
     }
 
     @GetMapping("/noticeBoard/{noticeBoard}/post/{id}")
-    public ResponseEntity<?> getPost(@PathVariable String id,@PathVariable String noticeBoard,HttpServletRequest request)  throws Exception{
+    public ResponseEntity<?> getPost(@PathVariable long id,@PathVariable String noticeBoard,HttpServletRequest request)  throws Exception{
 
         NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
-        Post post=postRepository.findById(Integer.parseInt(id));
+        Post post=postRepository.findById(id);
         if(post==null)
             throw new PostNotFoundException(id);
 
@@ -119,22 +124,26 @@ public class PostController {
         return ResponseEntity.ok(postDto);
     }
 
-    @PatchMapping("/post/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable String id,@RequestBody Post newPost)  throws Exception{
-
-        Post post=postRepository.findById(Integer.parseInt(id));
-        if(post==null)
-            throw new PostNotFoundException(id);
-
-        post.setText(newPost.getText());
-        postRepository.save(post);
-
-        return ResponseEntity.ok(returnPostData(post));
-    }
-
-
     public PostDto returnPostData(Post post){
-        PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getSurname(),post.getUsers().getRoom().getNumber());
+        PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUsers().getName(),post.getUsers().getSurname(),1);
         return postDto;
     }
+
+    @GetMapping("/post/{id}")
+    public ResponseEntity<?>getPostById(@PathVariable long id){
+        return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    @PutMapping("/post/{id}")
+    public ResponseEntity<?>updatePostById(@PathVariable long id, @RequestBody Post post){
+        return ResponseEntity.ok(postService.updatePostById(id,post));
+    }
+
+    @DeleteMapping("/post/{id}")
+    public ResponseEntity<?>deletePostById(@PathVariable long id){
+        postService.deletePostById(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

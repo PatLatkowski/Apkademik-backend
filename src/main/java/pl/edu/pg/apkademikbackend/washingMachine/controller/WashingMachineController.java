@@ -28,4 +28,21 @@ public class WashingMachineController {
         return ResponseEntity.ok(washingMachineService.getWashingMachines(dormName,floorNumber,commonSpaceNumber));
     }
 
+    @GetMapping("/washingMachine/{id}")
+    public ResponseEntity<?>getWashingMachineById(@PathVariable long id){
+        return ResponseEntity.ok(washingMachineService.getWashingMachineById(id));
+    }
+
+    @PutMapping("/washingMachine/{id}")
+    public ResponseEntity<?>updateWashingMachineById(@PathVariable long id, @RequestBody WashingMachine washingMachine){
+        return ResponseEntity.ok(washingMachineService.updateWashingMachineById(id,washingMachine));
+    }
+
+    @DeleteMapping("/washingMachine/{id}")
+    public ResponseEntity<?>deleteWashingMachineById(@PathVariable long id){
+        washingMachineService.deleteWashingMachineById(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

@@ -3,6 +3,7 @@ package pl.edu.pg.apkademikbackend.washingMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.edu.pg.apkademikbackend.commonSpace.CommonSpaceService;
+import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceNotFoundException;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
 import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineAlreadyExistException;
 import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineNotFoundException;
@@ -41,5 +42,31 @@ public class WashingMachineService {
         washingMachineRepository.save(washingMachine);
         return washingMachines;
     }
+
+    public WashingMachine getWashingMachineById(long id){
+        WashingMachine washingMachine = washingMachineRepository.findById(id);
+        if(washingMachine == null)
+            throw new WashingMachineNotFoundException(id);
+        return washingMachine;
+    }
+
+    public WashingMachine updateWashingMachineById(long id, WashingMachine newWashingMachine){
+        WashingMachine washingMachine = washingMachineRepository.findById(id);
+        if(washingMachine == null)
+            throw new CommonSpaceNotFoundException(id);
+        if(newWashingMachine.getNumber()!=0)
+            washingMachine.setNumber(newWashingMachine.getNumber());
+        if(newWashingMachine.getStatus()!=null)
+            washingMachine.setStatus(newWashingMachine.getStatus());
+        return washingMachineRepository.save(washingMachine);
+    }
+
+    public void deleteWashingMachineById(long id){
+        WashingMachine washingMachine = washingMachineRepository.findById(id);
+        if(washingMachine == null)
+            throw new  WashingMachineNotFoundException(id);
+        washingMachineRepository.delete(washingMachine);
+    }
+
 
 }

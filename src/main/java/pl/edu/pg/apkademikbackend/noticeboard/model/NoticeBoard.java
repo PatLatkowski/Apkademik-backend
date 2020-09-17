@@ -1,8 +1,8 @@
 package pl.edu.pg.apkademikbackend.noticeboard.model;
 
+import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 public class NoticeBoard {
@@ -13,6 +13,10 @@ public class NoticeBoard {
     private long id;
     @Column
     private  String name;
+
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "dorm_id",referencedColumnName = "dorm_id")
+    private Dorm dorm;
 
     public long getId(){
         return id;
@@ -27,5 +31,12 @@ public class NoticeBoard {
     public void setName(String name){
         this.name=name;
     }
+
+    public Dorm getDorm(){
+          return dorm;
+      }
+    public void setDorm(Dorm dorm){
+           this.dorm=dorm;
+       }
 
 }

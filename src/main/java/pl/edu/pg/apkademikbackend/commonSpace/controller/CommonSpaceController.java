@@ -71,4 +71,22 @@ public class CommonSpaceController {
         }
         return userName;
     }
+
+    @GetMapping("/commonSpace/{id}")
+    public ResponseEntity<?>getCommonSpaceById(@PathVariable long id){
+        return ResponseEntity.ok(commonSpaceService.getCommonSpaceById(id));
+    }
+
+    @PutMapping("/commonSpace/{id}")
+    public ResponseEntity<?>updateCommonSpaceById(@PathVariable long id, @RequestBody CommonSpace commonSpace){
+        return ResponseEntity.ok(commonSpaceService.updateCommonSpaceById(id,commonSpace));
+    }
+
+    @DeleteMapping("/commonSpace/{id}")
+    public ResponseEntity<?>deleteCommonSpaceById(@PathVariable long id){
+        commonSpaceService.deleteCommonSpaceById(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

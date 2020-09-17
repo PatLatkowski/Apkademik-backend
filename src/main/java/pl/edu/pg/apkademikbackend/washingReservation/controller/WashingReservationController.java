@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 import pl.edu.pg.apkademikbackend.washingReservation.WashingReservationService;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class WashingReservationController {
     @Autowired
-    private WashingReservationService washingReservationsService;
+    private WashingReservationService washingReservationService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
@@ -42,12 +43,30 @@ public class WashingReservationController {
         } catch (ExpiredJwtException e) {
             System.out.println("JWT Token has expired");
         }
-        return ResponseEntity.ok(washingReservationsService.saveWashingReservation(userName,commonSpaceNumber,washingMachineNumber,washingReservation));
+        return ResponseEntity.ok(washingReservationService.saveWashingReservation(userName,commonSpaceNumber,washingMachineNumber,washingReservation));
     }
 
     @GetMapping("/washingReservations")
     public ResponseEntity<?> getWashingReservations(@RequestParam String dormName, @RequestParam Integer floorNumber, @RequestParam Integer commonSpaceNumber,
                                                     @RequestParam Integer washingMachineNumber, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate){
-        return ResponseEntity.ok(washingReservationsService.getWashingReservations(dormName,floorNumber,commonSpaceNumber,washingMachineNumber,localDate));
+        return ResponseEntity.ok(washingReservationService.getWashingReservations(dormName,floorNumber,commonSpaceNumber,washingMachineNumber,localDate));
     }
+
+
+    @GetMapping("/washingReservation/{id}")
+    public ResponseEntity<?>getWashingReservationById(@PathVariable long id){
+        return ResponseEntity.ok(washingReservationService.getWashingReservationById(id));
+    }
+
+    @PutMapping("/washingReservation/{id}")
+    public ResponseEntity<?>updateWashingReservationById(@PathVariable long id, @RequestBody WashingReservation washingReservation){
+        return ResponseEntity.ok(washingReservationService.updateWashingReservationById(id,washingReservation));
+    }
+
+    @DeleteMapping("/washingReservation/{id}")
+    public ResponseEntity<?>deleteWashingReservationById(@PathVariable long id){
+        washingReservationService.deleteWashingReservationById(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -1,4 +1,4 @@
-package pl.edu.pg.apkademikbackend.noticeboard;
+package pl.edu.pg.apkademikbackend.post;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

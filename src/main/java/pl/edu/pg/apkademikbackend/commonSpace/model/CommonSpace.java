@@ -89,4 +89,12 @@ public class CommonSpace {
     public void setFloor(Floor floor) {
         this.floor = floor;
     }
+
+    public void addWashingMachine(WashingMachine washingMachine){
+        this.washingMachines.add(washingMachine);
+    }
+
+    public void removeWashingMachine(WashingMachine washingMachine){
+        this.washingMachines.remove(washingMachine);
+    }
 }

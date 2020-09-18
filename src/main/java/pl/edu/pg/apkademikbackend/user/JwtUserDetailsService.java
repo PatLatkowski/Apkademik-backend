@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
 import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.InvalidPasswordException;
+import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
 import pl.edu.pg.apkademikbackend.dorm.DormService;
 import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
@@ -24,16 +26,13 @@ import java.util.Set;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
-    private UserRepository userDao;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private DormService dormService;
@@ -43,7 +42,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UserNotFoundException {
-        UserDao user = userDao.findByEmail(email);
+        UserDao user = userRepository.findByEmail(email);
         if(user == null){
             throw new UserNotFoundException(email);
         }
@@ -65,14 +64,14 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     public UserDao save(UserDto user, String email){
-        UserDao updatedUser = userDao.findByEmail(email);
+        UserDao updatedUser = userRepository.findByEmail(email);
         if(updatedUser == null){
             throw new UserNotFoundException(email);
         }
         return saveUserDao(updatedUser,user);
     }
     public UserDao save(UserDto user, String email, String oldPassword){
-        UserDao updatedUser = userDao.findByEmail(email);
+        UserDao updatedUser = userRepository.findByEmail(email);
         if(updatedUser == null){
             throw new UserNotFoundException(email);
         }
@@ -93,7 +92,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             updatedUser.setDorm(dormService.getDormById(user.getDormId()));
         if(user.getRoomId()!=null)
             roomService.getRoom(user.getRoomId()).addResident(updatedUser);
-        return userDao.save(updatedUser);
+        return userRepository.save(updatedUser);
     }
     public String getUserEmailFromToken(HttpServletRequest request ){
         final String requestTokenHeader = request.getHeader("Authorization");
@@ -120,7 +119,23 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDao getUser(long id){
         UserDao user = userRepository.findById(id);
         if(user == null)
-            throw new UserNotFoundException("sadsa");
+            throw new UserNotFoundException(id);
         return user;
+    }
+
+    @Transactional
+    public void deleteByEmail(String email){
+        UserDao user = getUser(email);
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public void deleteById(long id){
+        UserDao user = this.getUser(id);
+        userRepository.delete(user);
+    }
+
+    public Set<Role> getRoles(long id){
+        return userRepository.findById(id).getRoles();
     }
 }

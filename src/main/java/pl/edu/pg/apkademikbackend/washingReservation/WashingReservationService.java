@@ -2,27 +2,29 @@ package pl.edu.pg.apkademikbackend.washingReservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceNotFoundException;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
-import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpaceDTO;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpaceType;
+import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpacesWithWashingMachines;
+import pl.edu.pg.apkademikbackend.dorm.exception.DormNotFoundException;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.floor.model.FloorWithWashingMachines;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 import pl.edu.pg.apkademikbackend.washingMachine.WashingMachineService;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
-import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDTO;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineActualReservationsDOT;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationCollideException;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationNotFoundException;
-import pl.edu.pg.apkademikbackend.washingReservation.model.DateAndStartingHours;
-import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
+import pl.edu.pg.apkademikbackend.washingReservation.model.*;
 import pl.edu.pg.apkademikbackend.washingReservation.repository.WashingReservationRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -35,20 +37,14 @@ public class WashingReservationService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<WashingReservation> getWashingReservations(String dormName, Integer floorNumber, Integer commonSpaceNumber,
-                                                           Integer washingMachineNumber, LocalDate localDate){
-        WashingMachine washingMachine = washingMachineService.getWashingMachine(dormName, floorNumber, commonSpaceNumber, washingMachineNumber);
+    public List<WashingReservation> getWashingReservations(long washingMachineId, LocalDate localDate){
+        WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingMachineId);
         return washingMachine.getWashingReservations().stream()
                 .filter(washingReservation -> washingReservation.getDate().equals(localDate))
                 .collect(Collectors.toList());
     }
 
-    public List<WashingReservation> getWashingReservationsFromWashingMachine(){
-        return null;
-    }
-
-
-    public List<WashingReservation> saveWashingReservation(String dormName, Integer floorNumber, Integer commonSpaceNumber,
+    /*public List<WashingReservation> saveWashingReservation(String dormName, Integer floorNumber, Integer commonSpaceNumber,
                                                            Integer washingMachineNumber, WashingReservation washingReservation){
         WashingMachine washingMachine = washingMachineService.getWashingMachine(dormName,floorNumber,commonSpaceNumber,washingMachineNumber);
         List<WashingReservation> washingReservations = washingMachine.getWashingReservations();
@@ -59,78 +55,72 @@ public class WashingReservationService {
         washingMachine.setWashingReservations(washingReservations);
         washingReservationRepository.save(washingReservation);
         return washingReservations;
-    }
+    }*/
 
-    public List<WashingReservation> saveWashingReservation(String userEmail, Integer commonSpaceNumber, Integer washingMachineNumber, WashingReservation[] washingReservations){
+    public List<WashingReservation> saveWashingReservation(String userEmail, WashingReservationDto washingReservationsDto){
         UserDao user = userRepository.findByEmail(userEmail);
-        Dorm dorm = user.getDorm();
-        CommonSpace commonSpace = null;
-        for (Floor floor : dorm.getFloors()) {
-            for (CommonSpace commonSpace1:
-                 floor.getCommonSpaces()) {
-                if(commonSpace1.getNumber() == commonSpaceNumber && commonSpace1.getFloor().getNumber() == floor.getNumber())
-                    commonSpace = commonSpace1;
-            }
-        }
-        if(commonSpace == null)
-            throw new CommonSpaceNotFoundException(commonSpaceNumber);
-
-        WashingMachine washingMachine = washingMachineService.getWashingMachine(dorm.getName(),commonSpace.getFloor().getNumber(),commonSpaceNumber,washingMachineNumber);
+        WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingReservationsDto.getWashingMachineId());
         List<WashingReservation> washingReservationsNow = washingMachine.getWashingReservations();
+        List<WashingReservation> washingReservations = washingReservationsDto.getWashingReservations();
         for (WashingReservation washingReservation:
              washingReservations) {
         if(washingReservationsNow.stream()
                 .anyMatch(washingReservation1 -> washingReservation1.collide(washingReservation)))
             throw new WashingReservationCollideException(LocalDateTime.of(washingReservation.getDate(),washingReservation.getStart()));
-        washingReservationsNow.add(washingReservation);
         }
         washingMachine.addWashingReservations(washingReservations);
         user.addWashingReservations(washingReservations);
-        return washingReservationRepository.saveAll(Arrays.asList(washingReservations));
+        return washingReservationRepository.saveAll(washingReservations);
     }
 
-    public List<CommonSpaceDTO> getWashingReservationsFromCommonSpaceByDate(String userEmail, LocalDate date){
+    public List<FloorWithWashingMachines> getWashingReservationsFromCommonSpaceByDate(String userEmail, LocalDate date){
         UserDao user = userRepository.findByEmail(userEmail);
         Dorm dorm = user.getDorm();
-        List<CommonSpaceDTO> laundries = new ArrayList<>();
+        if(dorm == null)
+            throw new DormNotFoundException(0);
+        List<FloorWithWashingMachines> floorWithWashingMachines = new ArrayList<>();
         for (Floor floor1:
                 dorm.getFloors()) {
             for (CommonSpace commonSpace:
                     floor1.getCommonSpaces()) {
+                List<CommonSpacesWithWashingMachines> laundries = new ArrayList<>();
                 if(commonSpace.getType() == CommonSpaceType.LAUNDRY){
-                    List<WashingMachineDTO> washingMachinesToSend = new ArrayList<>();
+                    List<WashingMachineActualReservationsDOT> washingMachinesToSend = new ArrayList<>();
                     for (WashingMachine washingMachine:
                          commonSpace.getWashingMachines()) {
                         List<WashingReservation> washingReservations = washingMachine.getWashingReservations().stream()
                                 .filter(washingReservation -> washingReservation.getDate().equals(date))
                                 .collect(Collectors.toList());
-                        washingMachinesToSend.add(new WashingMachineDTO(washingMachine.getNumber(),washingMachine.getStatus(),washingReservations));
+                        List<WashingReservation> washingReservationsMine = user.getWashingReservations().stream()
+                                .filter(washingReservation -> washingReservation.getDate().equals(date))
+                                .collect(Collectors.toList());
+                        List<WashingReservationIsMine> washingReservationIsMines = new ArrayList<>();
+                        for (WashingReservation washingReservation:
+                             washingReservations) {
+                            for(WashingReservation washingReservationMine:
+                            washingReservationsMine){
+                                if(washingReservation.equals(washingReservationMine))
+                                    washingReservationIsMines.add(new WashingReservationIsMine(true,washingReservation));
+                                else
+                                    washingReservationIsMines.add(new WashingReservationIsMine(false,washingReservation));
+                            }
+                        }
+                        washingMachinesToSend.add(new WashingMachineActualReservationsDOT(washingMachine,washingReservationIsMines));
                     }
-                    laundries.add(new CommonSpaceDTO(commonSpace.getNumber(),commonSpace.getSize(),commonSpace.getName(),commonSpace.getType(),washingMachinesToSend));
+                    laundries.add(new CommonSpacesWithWashingMachines(commonSpace,washingMachinesToSend));
                 }
+                floorWithWashingMachines.add(new FloorWithWashingMachines(floor1.getId(),floor1.getNumber(),laundries));
             }
         }
-        return laundries;
+        return floorWithWashingMachines;
     }
 
-    public List<DateAndStartingHours> getWashingReservationFromFiveDays(String userEmail, Integer commonSpaceNumber, Integer washingMachineNumber, LocalDate date) {
+    public List<DateAndStartingHours> getWashingReservationFromFiveDays(String userEmail, long washingMachineId, LocalDate date) {
         UserDao user = userRepository.findByEmail(userEmail);
-        Dorm dorm = user.getDorm();
-        CommonSpace commonSpace = null;
-        for (Floor floor : dorm.getFloors()) {
-            for (CommonSpace commonSpace1 :
-                    floor.getCommonSpaces()) {
-                if (commonSpace1.getNumber() == commonSpaceNumber && commonSpace1.getFloor().getNumber() == floor.getNumber())
-                    commonSpace = commonSpace1;
-            }
-        }
-        if (commonSpace == null)
-            throw new CommonSpaceNotFoundException(commonSpaceNumber);
-
-        WashingMachine washingMachine = washingMachineService.getWashingMachine(dorm.getName(), commonSpace.getFloor().getNumber(), commonSpaceNumber, washingMachineNumber);
+        WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingMachineId);
         List<WashingReservation> washingReservationsWithinFiveDays = washingMachine.getWashingReservations().stream()
                 .filter(washingReservation -> isWithinTwoDays(washingReservation.getDate(),date))
-                .sorted(Comparator.comparing(WashingReservation::getDate))
+                .sorted(Comparator.comparing(WashingReservation::getDate).thenComparing(WashingReservation::getStart))
                 .collect(Collectors.toList());
         List<DateAndStartingHours> dateAndStartingHours = new ArrayList<>();
         dateAndStartingHours.add(new DateAndStartingHours(date.minus(2,ChronoUnit.DAYS)));
@@ -143,12 +133,23 @@ public class WashingReservationService {
             dateAndStartingHours.stream()
                     .filter(dateAndStartingHours1 -> dateAndStartingHours1.getDate().equals(washingReservation.getDate()))
                     .findAny()
-                    .ifPresent(andStartingHours -> andStartingHours.addStartingHours(washingReservation.getStart()));
+                    .ifPresent(andStartingHours -> andStartingHours.addStartingHours(new StartingHour(washingReservation.getStart(),false)));
+        }
+        List<WashingReservation> myReservations = user.getWashingReservations();
+        for (WashingReservation washingReservation:
+                myReservations) {
+            for(DateAndStartingHours dateAndStartingHours1:
+            dateAndStartingHours){
+                if(dateAndStartingHours1.getDate().equals(washingReservation.getDate()))
+                    dateAndStartingHours1.getStartingHours().stream()
+                    .filter(startingHour -> startingHour.getStartingHour().equals(washingReservation.getStart()))
+                    .forEach(startingHour -> startingHour.setMine(true));
+            }
         }
         return dateAndStartingHours;
     }
     private boolean isWithinTwoDays(LocalDate testDate, LocalDate dateToCompare) {
-        return testDate.isAfter(dateToCompare.minus(2, ChronoUnit.DAYS)) && dateToCompare.isBefore(testDate.plus(2,ChronoUnit.DAYS));
+        return testDate.isAfter(dateToCompare.minus(3, ChronoUnit.DAYS)) && testDate.isBefore(dateToCompare.plus(3,ChronoUnit.DAYS));
     }
 
 

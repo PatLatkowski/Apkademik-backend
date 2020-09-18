@@ -8,6 +8,7 @@ import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
 import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineAlreadyExistException;
 import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineNotFoundException;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDto;
 import pl.edu.pg.apkademikbackend.washingMachine.repository.WashingMachineRepository;
 
 import java.util.List;
@@ -20,26 +21,33 @@ public class WashingMachineService {
     @Autowired
     private CommonSpaceService commonSpaceService;
 
-    public List<WashingMachine> getWashingMachines(String dormName, Integer floorNumber, Integer commonSpaceNumber){
+    /*public List<WashingMachine> getWashingMachines(String dormName, Integer floorNumber, Integer commonSpaceNumber){
         return commonSpaceService.getCommonSpace(dormName,floorNumber,commonSpaceNumber)
                 .getWashingMachines();
+    }*/
+    public List<WashingMachine> getWashingMachines(long commonSpaceId){
+        return commonSpaceService.getCommonSpaceById(commonSpaceId)
+                .getWashingMachines();
     }
-    public WashingMachine getWashingMachine(String dormName, Integer floorNumber, Integer commonSpaceNumber, Integer washingMachineNumber){
+    /*public WashingMachine getWashingMachine(String dormName, Integer floorNumber, Integer commonSpaceNumber, Integer washingMachineNumber){
         return this.getWashingMachines(dormName,floorNumber,commonSpaceNumber).stream()
                 .filter(washingMachine1 -> washingMachineNumber == washingMachine1.getNumber())
                 .findAny()
                 .orElseThrow(() -> new WashingMachineNotFoundException(washingMachineNumber));
-    }
-    public List<WashingMachine> saveWashingMachines(String dormName, Integer floorNumber, Integer commonSpaceNumber, WashingMachine washingMachine){
-        CommonSpace commonSpace = commonSpaceService.getCommonSpace(dormName,floorNumber,commonSpaceNumber);
+    }*/
+
+    public List<WashingMachine> saveWashingMachine(WashingMachineDto washingMachine){
+        CommonSpace commonSpace = commonSpaceService.getCommonSpaceById(washingMachine.getCommonSpaceId());
         List<WashingMachine> washingMachines = commonSpace.getWashingMachines();
         if(washingMachines.stream()
                 .anyMatch(washingMachine1 -> washingMachine.getNumber() == washingMachine1.getNumber()))
             throw new WashingMachineAlreadyExistException(washingMachine.getNumber());
-
-        washingMachines.add(washingMachine);
-        commonSpace.setWashingMachines(washingMachines);
-        washingMachineRepository.save(washingMachine);
+        WashingMachine newWashingMachine = new WashingMachine();
+        newWashingMachine.setNumber(washingMachine.getNumber());
+        newWashingMachine.setStatus(washingMachine.getStatus());
+        washingMachines.add(newWashingMachine);
+        commonSpace.addWashingMachine(newWashingMachine);
+        washingMachineRepository.save(newWashingMachine);
         return washingMachines;
     }
 

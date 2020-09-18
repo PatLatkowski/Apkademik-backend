@@ -9,13 +9,13 @@ public class NoticeBoard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="noticeBoard_id")
+    @Column
     private long id;
     @Column
     private  String name;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "dorm_id",referencedColumnName = "dorm_id")
+    @JoinColumn(name = "dorm_id",referencedColumnName = "id")
     private Dorm dorm;
 
     public long getId(){

@@ -5,7 +5,6 @@ import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -57,7 +56,7 @@ public class WashingMachine {
     public void setWashingReservations(List<WashingReservation> washingReservations) {
         this.washingReservations = washingReservations;
     }
-    public void addWashingReservations(WashingReservation[] newWashingReservations){
-        this.washingReservations.addAll(Arrays.asList(newWashingReservations));
+    public void addWashingReservations(List<WashingReservation> newWashingReservations){
+        this.washingReservations.addAll(newWashingReservations);
     }
 }

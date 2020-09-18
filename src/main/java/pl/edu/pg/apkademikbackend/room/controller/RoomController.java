@@ -2,10 +2,10 @@ package pl.edu.pg.apkademikbackend.room.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.room.model.Room;
+import pl.edu.pg.apkademikbackend.room.model.RoomDto;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,23 +18,14 @@ public class RoomController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/room")
-    public ResponseEntity<?> addRoom(@RequestParam String dormName,@RequestParam Integer floorNumber, @RequestBody Room room){
-        return ResponseEntity.ok(roomService.saveRoom(dormName,floorNumber,room));
+    public ResponseEntity<?> addRoom(@RequestBody RoomDto room){
+        return ResponseEntity.ok(roomService.saveRoom(room));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/rooms")
-    public ResponseEntity<?> getRooms(@RequestParam String dormName, @RequestParam Integer floorNumber){
-        return ResponseEntity.ok(roomService.getRooms(dormName,floorNumber));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/room/{userEmail}")
-    public ResponseEntity<?> addUserToRoom(@RequestParam String dormName,@RequestParam Integer floorNumber,
-                                           @RequestParam Integer roomNumber, @PathVariable String userEmail){
-        return ResponseEntity.ok(roomService.addUserToRoom(dormName,floorNumber,roomNumber,userEmail));
+    @PostMapping("/room/{roomId}/user/{userId}")
+    public ResponseEntity<?> addUserToRoom(@PathVariable long roomId, @PathVariable long userId){
+        return ResponseEntity.ok(roomService.addUserToRoom(roomId,userId));
     }
 
     @GetMapping("/room/{id}")

@@ -28,20 +28,21 @@ public class DormController {
         return ResponseEntity.ok(dormService.saveDorm(dorm));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    /*@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dorm/{dormName}")
     public ResponseEntity<?> getDorm(@PathVariable String dormName){
         return ResponseEntity.ok(dormService.getDorm(dormName));
+    }*/
+
+    @GetMapping("/dorm")
+    public ResponseEntity<?> getDorm(HttpServletRequest request){
+        String email = userDetailsService.getUserEmailFromToken(request);
+        return ResponseEntity.ok(dormService.getDormByUserEmail(email));
     }
 
     @GetMapping("/dorm/{id}")
     public ResponseEntity<?>getDormById(@PathVariable long id){
         return ResponseEntity.ok(dormService.getDormById(id));
-    }
-
-    @GetMapping("/dorms")
-    public ResponseEntity<?> getAllDorms(){
-        return ResponseEntity.ok(dormService.getAllDorms());
     }
 
     @PutMapping("/dorm/{id}")
@@ -54,15 +55,17 @@ public class DormController {
         dormService.deleteDormById(id);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/dorm")
-    public ResponseEntity<?> getDorm(HttpServletRequest request){
-        String email = userDetailsService.getUserEmailFromToken(request);
-        return ResponseEntity.ok(dormService.getDormByUserEmail(email));
+
+    @GetMapping("/dorms")
+    public ResponseEntity<?> getAllDorms(){
+        return ResponseEntity.ok(dormService.getAllDorms());
     }
+
     @GetMapping("/dorm/{id}/noticeboards")
     public ResponseEntity<?> getAllNoticeBoardsFromDorm(@PathVariable long id){
         return ResponseEntity.ok(dormService.getAllDorms());
     }
+
     @GetMapping("/dorm/{id}/floors")
     public ResponseEntity<?> getAllFloorsFromDorm(@PathVariable long id){
         return ResponseEntity.ok(floorService.getAllFloorsFromDorm(id));

@@ -1,26 +1,26 @@
 package pl.edu.pg.apkademikbackend.washingReservation.model;
 
-import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDTO;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineActualReservationsDOT;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WashingReservationsFromCommonSpaceByDate {
-    private List<WashingMachineDTO> washingMachines;
+    private List<WashingMachineActualReservationsDOT> washingMachines;
 
     public WashingReservationsFromCommonSpaceByDate() {
         washingMachines = new ArrayList<>();
     }
 
-    public List<WashingMachineDTO> getWashingMachines() {
+    public List<WashingMachineActualReservationsDOT> getWashingMachines() {
         return washingMachines;
     }
 
-    public void setWashingMachines(List<WashingMachineDTO> washingMachines) {
+    public void setWashingMachines(List<WashingMachineActualReservationsDOT> washingMachines) {
         this.washingMachines = washingMachines;
     }
 
-    public void addWashingMachine(WashingMachineDTO washingMachineDTO){
-        washingMachines.add(washingMachineDTO);
+    public void addWashingMachine(WashingMachineActualReservationsDOT washingMachineActualReservationsDOT){
+        washingMachines.add(washingMachineActualReservationsDOT);
     }
 }

@@ -13,7 +13,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="post_id")
+    @Column(name="id")
     private long id;
     @Column
     private  String title;
@@ -23,11 +23,11 @@ public class Post {
     private  LocalDateTime date;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "user_id",referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserDao user;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "noticeBoard_id",referencedColumnName = "noticeBoard_id")
+    @JoinColumn(name = "noticeBoard_id",referencedColumnName = "id")
     private NoticeBoard noticeBoard;
 
     public long getId(){

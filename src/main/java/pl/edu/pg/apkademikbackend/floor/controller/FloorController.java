@@ -2,10 +2,11 @@ package pl.edu.pg.apkademikbackend.floor.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.pg.apkademikbackend.commonSpace.CommonSpaceService;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.floor.model.FloorDto;
 import pl.edu.pg.apkademikbackend.room.RoomService;
 
 
@@ -16,30 +17,25 @@ public class FloorController {
     private FloorService floorService;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private CommonSpaceService commonSpaceService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/floor")
-    public ResponseEntity<?> addFloor(@RequestParam String dormName, @RequestBody Floor floor){
+    public ResponseEntity<?> addFloor(@RequestBody FloorDto floor){
 
-        return ResponseEntity.ok(floorService.saveFloor(dormName,floor));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/floors")
-    public ResponseEntity<?> getFloors(@RequestParam String dormName){
-
-        return ResponseEntity.ok(floorService.getFloors(dormName));
+        return ResponseEntity.ok(floorService.saveFloor(floor));
     }
 
     @GetMapping("/floor/{id}")
     public ResponseEntity<?> getFloor(@PathVariable long id){
-        return ResponseEntity.ok(floorService.getFloor(id));
+        return ResponseEntity.ok(floorService.getFloorById(id));
     }
 
     @PutMapping("/floor/{id}")
     public ResponseEntity<?> updateFloor(@PathVariable long id, @RequestBody Floor floor){
         return ResponseEntity.ok(floorService.updateFloor(id,floor));
     }
+
     @DeleteMapping("/floor/{id}")
     public ResponseEntity<?> deleteFloor(@PathVariable long id){
         floorService.deleteFloor(id);
@@ -49,5 +45,10 @@ public class FloorController {
     @GetMapping("/floor/{floorId}/rooms")
     public ResponseEntity<?> getAllRoomsFromFloor(@PathVariable long floorId){
         return ResponseEntity.ok(roomService.getAllRoomsFromFloor(floorId));
+    }
+
+    @GetMapping("/floor/{floorId}/commonSpaces")
+    public ResponseEntity<?> getCommonSpaces(@PathVariable long floorId){
+        return ResponseEntity.ok(commonSpaceService.getCommonSpaces(floorId));
     }
 }

@@ -7,6 +7,7 @@ import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.floor.exception.FloorAlreadyExistException;
 import pl.edu.pg.apkademikbackend.floor.exception.FloorNotFoundException;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.floor.model.FloorDto;
 import pl.edu.pg.apkademikbackend.floor.repository.FloorRepository;
 
 import java.util.List;
@@ -18,33 +19,28 @@ public class FloorService {
     @Autowired
     DormService dormService;
 
-    public List<Floor> getFloors(String dormName){
-        return dormService.getDorm(dormName)
+    public List<Floor> getFloors(long dormId){
+        return dormService.getDormById(dormId)
                 .getFloors();
     }
 
-    public Floor getFloor(String dormName, Integer floorNumber){
-        return this.getFloors(dormName).stream()
-                .filter(floor1 -> floorNumber.equals(floor1.getNumber()))
-                .findAny()
-                .orElseThrow(() -> new FloorNotFoundException(floorNumber));
-    }
-
-    public Floor getFloor(long id){
+    public Floor getFloorById(long id){
         Floor floor = floorRepository.findById(id);
         if(floor==null)
             throw new FloorNotFoundException(id);
         return floor;
     }
 
-    public List<Floor> saveFloor(String dormName, Floor floor){
-        Dorm dorm = dormService.getDorm(dormName);
+    public List<Floor> saveFloor(FloorDto newFloor){
+        Dorm dorm = dormService.getDormById(newFloor.getDormId());
         List<Floor> floors = dorm.getFloors();
-
+        if(newFloor.getNumber()==null)
+            throw new FloorNotFoundException(null);
         if (floors.stream()
-                .anyMatch(floor1 -> floor1.getNumber() == floor.getNumber()))
-            throw new FloorAlreadyExistException(floor.getNumber());
-
+                .anyMatch(floor1 -> floor1.getNumber() == newFloor.getNumber()))
+            throw new FloorAlreadyExistException(newFloor.getNumber());
+        Floor floor = new Floor();
+        floor.setNumber(newFloor.getNumber());
         floors.add(floor);
         dorm.setFloors(floors);
         floorRepository.save(floor);
@@ -52,14 +48,14 @@ public class FloorService {
     }
 
     public Floor updateFloor(long id, Floor updatedFloor){
-        Floor floor = this.getFloor(id);
+        Floor floor = this.getFloorById(id);
         if(updatedFloor.getNumber()!=0)
             floor.setNumber(updatedFloor.getNumber());
         return floor;
     }
 
     public void deleteFloor(long id){
-        Floor floor = this.getFloor(id);
+        Floor floor = this.getFloorById(id);
         floorRepository.delete(floor);
     }
 

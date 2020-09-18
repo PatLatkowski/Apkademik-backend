@@ -11,7 +11,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
@@ -22,7 +21,6 @@ public class WashingReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
-
     private WashingReservationStatus status;
     @Column
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")

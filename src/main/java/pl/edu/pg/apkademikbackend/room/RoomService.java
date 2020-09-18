@@ -2,13 +2,14 @@ package pl.edu.pg.apkademikbackend.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.edu.pg.apkademikbackend.dorm.repository.DormRepository;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.room.exception.RoomAlreadyExistException;
 import pl.edu.pg.apkademikbackend.room.exception.RoomNotFoundException;
 import pl.edu.pg.apkademikbackend.room.model.Room;
+import pl.edu.pg.apkademikbackend.room.model.RoomDto;
 import pl.edu.pg.apkademikbackend.room.repository.RoomRepository;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
@@ -23,17 +24,10 @@ public class RoomService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private DormRepository dormRepository;
+    private JwtUserDetailsService userDetailsService;
 
-    public List<Room> getRooms(String dormName, Integer floorNumber){
-        return floorService.getFloor(dormName,floorNumber).getRooms();
-    }
-
-    public Room getRoom(String dormName, Integer floorNumber, Integer roomNumber){
-        return this.getRooms(dormName,floorNumber).stream()
-                .filter(room -> room.getNumber() == roomNumber)
-                .findAny()
-                .orElseThrow(() -> new RoomNotFoundException(roomNumber));
+    public List<Room> getRooms(long id){
+        return floorService.getFloorById(id).getRooms();
     }
 
     public Room getRoom(long id){
@@ -43,25 +37,26 @@ public class RoomService {
         return room;
     }
 
-    public Room saveRoom(String dormName, Integer floorNumber, Room room){
-        Floor floor = floorService.getFloor(dormName,floorNumber);
+    public Room saveRoom(RoomDto newRoom){
+        Floor floor = floorService.getFloorById(newRoom.getFloorId());
         List<Room> rooms = floor.getRooms();
         if(rooms.stream()
-                .anyMatch(room1 -> room1.getNumber() == room.getNumber()))
-            throw new RoomAlreadyExistException(room.getNumber());
+                .anyMatch(room1 -> room1.getNumber().equals(newRoom.getNumber())))
+            throw new RoomAlreadyExistException(newRoom.getNumber());
+        Room room = new Room();
+        room.setSize(newRoom.getSize());
+        room.setNumber(newRoom.getNumber());
         rooms.add(room);
         floor.setRooms(rooms);
         return roomRepository.save(room);
     }
 
-    public List<UserDao> addUserToRoom(String dormName, Integer floorNumber,
-                              Integer roomNumber, String userEmail){
-        Room room = this.getRoom(dormName, floorNumber, roomNumber);
-
-        UserDao user = userRepository.findByEmail(userEmail);
-        user.setDorm(dormRepository.findByName(dormName));
+    public List<UserDao> addUserToRoom(long roomId, long userId){
+        Room room = this.getRoom(roomId);
+        UserDao user = userDetailsService.getUser(userId);
         room.addResident(user);
         userRepository.save(user);
+        roomRepository.save(room);
         return room.getResidents();
     }
 
@@ -73,7 +68,7 @@ public class RoomService {
             room.setSize(updatedRoom.getSize());
         if(updatedRoom.getResidents()!=null)
             room.setResidents(updatedRoom.getResidents());
-        return room;
+        return roomRepository.save(room);
     }
 
     public void deleteRoom(long id){
@@ -82,7 +77,7 @@ public class RoomService {
     }
 
     public List<Room> getAllRoomsFromFloor(long id){
-        return floorService.getFloor(id).getRooms();
+        return floorService.getFloorById(id).getRooms();
     }
 
     public Room getRoomFromUserEmail(String userEmail){

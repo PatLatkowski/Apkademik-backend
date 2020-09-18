@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceAlreadyExistException;
 import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceNotFoundException;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
+import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpaceDto;
 import pl.edu.pg.apkademikbackend.commonSpace.repository.CommonSpaceRepository;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
@@ -25,25 +26,23 @@ public class CommonSpaceService {
         return commonSpace;
     }
 
-    public List<CommonSpace> getCommonSpaces(String dormName, Integer floorNumber){
-        return floorService.getFloor(dormName,floorNumber)
+    public List<CommonSpace> getCommonSpaces(long floorId){
+        return floorService.getFloorById(floorId)
                 .getCommonSpaces();
     }
-    public CommonSpace getCommonSpace(String dormName, Integer floorNumber, Integer commonSpaceNumber){
-        return this.getCommonSpaces(dormName,floorNumber)
-                .stream()
-                .filter(commonSpace1 -> commonSpaceNumber == commonSpace1.getNumber())
-                .findAny()
-                .orElseThrow(()-> new CommonSpaceNotFoundException(commonSpaceNumber));
-    }
-    public List<CommonSpace> saveCommonSpace(String dormName, Integer floorNumber,CommonSpace commonSpace){
-        Floor floor = floorService.getFloor(dormName,floorNumber);
+
+    public List<CommonSpace> saveCommonSpace(CommonSpaceDto newCommonSpace){
+        Floor floor = floorService.getFloorById(newCommonSpace.getFloorId());
         List<CommonSpace> commonSpaces = floor.getCommonSpaces();
 
         if(commonSpaces.stream()
-                .anyMatch(commonSpace1 -> commonSpace.getNumber() == commonSpace1.getNumber()))
-            throw new CommonSpaceAlreadyExistException(commonSpace.getNumber());
-
+                .anyMatch(commonSpace1 -> newCommonSpace.getNumber() == commonSpace1.getNumber()))
+            throw new CommonSpaceAlreadyExistException(newCommonSpace.getNumber());
+        CommonSpace commonSpace = new CommonSpace();
+        commonSpace.setName(newCommonSpace.getName());
+        commonSpace.setNumber(newCommonSpace.getNumber());
+        commonSpace.setSize(newCommonSpace.getSize());
+        commonSpace.setType(newCommonSpace.getType());
         floor.addCommonSpace(commonSpace);
         commonSpaceRepository.save(commonSpace);
         return commonSpaces;

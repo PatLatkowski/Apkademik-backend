@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.room.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import javax.persistence.*;
@@ -12,19 +13,20 @@ import java.util.List;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="room_id")
+    @Column
     private long id;
     @Column
     private Integer number;
     @Column
     private int size;
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany
     @JoinColumn(name = "room_id")
     @JsonIgnore
     private List<UserDao> residents = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "floor_id")
+    @JsonIgnore
+    private Floor floor;
 
     public long getId() {
         return id;
@@ -66,5 +68,13 @@ public class Room {
     public void removeResident(UserDao user){
         residents.remove(user);
         user.setRoom(null);
+    }
+
+    public Floor getFloor() {
+        return floor;
+    }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
     }
 }

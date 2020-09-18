@@ -1,12 +1,17 @@
 package pl.edu.pg.apkademikbackend.washingMachine.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 import pl.edu.pg.apkademikbackend.washingMachine.WashingMachineService;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDto;
+import pl.edu.pg.apkademikbackend.washingReservation.WashingReservationService;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 
 
 @RestController
@@ -14,18 +19,14 @@ import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 public class WashingMachineController {
     @Autowired
     private WashingMachineService washingMachineService;
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
+    @Autowired
+    private WashingReservationService washingReservationService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/washingMachine")
-    public ResponseEntity<?> addWashingMachine(@RequestParam String dormName, @RequestParam Integer floorNumber, @RequestParam Integer commonSpaceNumber,
-                                            @RequestBody WashingMachine washingMachine){
-        return ResponseEntity.ok(washingMachineService.saveWashingMachines(dormName,floorNumber,commonSpaceNumber,washingMachine));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/washingMachines")
-    public ResponseEntity<?> getWashingMachines(@RequestParam String dormName, @RequestParam Integer floorNumber, @RequestParam Integer commonSpaceNumber){
-        return ResponseEntity.ok(washingMachineService.getWashingMachines(dormName,floorNumber,commonSpaceNumber));
+    public ResponseEntity<?> addWashingMachine(@RequestBody WashingMachineDto washingMachine){
+        return ResponseEntity.ok(washingMachineService.saveWashingMachine(washingMachine));
     }
 
     @GetMapping("/washingMachine/{id}")
@@ -44,5 +45,16 @@ public class WashingMachineController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/washingMachine/{washingMachineId}/washingReservations/fiveDays")
+    public ResponseEntity<?> getAllWashingReservationsByDateFromFiveDays(HttpServletRequest request, @PathVariable long washingMachineId,
+                                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        String email = userDetailsService.getUserEmailFromToken(request);
+        return ResponseEntity.ok(washingReservationService.getWashingReservationFromFiveDays(email,washingMachineId,date));
+    }
+
+    @GetMapping("/washingMachine/{washingMachineId}/washingReservations")
+    public ResponseEntity<?> getWashingReservations(@PathVariable long washingMachineId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate){
+        return ResponseEntity.ok(washingReservationService.getWashingReservations(washingMachineId,localDate));
+    }
 
 }

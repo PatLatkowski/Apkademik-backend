@@ -2,8 +2,10 @@ package pl.edu.pg.apkademikbackend.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
+import pl.edu.pg.apkademikbackend.comment.model.Comment;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.model.CommonSpaceReservation;
+import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.room.model.Room;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
@@ -29,26 +31,37 @@ public class UserDao {
     @Column
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "USER_ROLES", joinColumns = {
             @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
             @JoinColumn(name = "ROLE_ID") })
     @JsonIgnore
     private Set<Role> roles;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
+    @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private List<WashingReservation> washingReservations  = new ArrayList<>();
 
-    @OneToMany(
-            cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private List<CommonSpaceReservation> commonSpaceReservations = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dorm_id")
@@ -122,6 +135,21 @@ public class UserDao {
 
     public void setCommonSpaceReservations(List<CommonSpaceReservation> commonSpaceReservations) {
         this.commonSpaceReservations = commonSpaceReservations;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public Dorm getDorm() {

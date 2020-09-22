@@ -44,19 +44,6 @@ public class WashingReservationService {
                 .collect(Collectors.toList());
     }
 
-    /*public List<WashingReservation> saveWashingReservation(String dormName, Integer floorNumber, Integer commonSpaceNumber,
-                                                           Integer washingMachineNumber, WashingReservation washingReservation){
-        WashingMachine washingMachine = washingMachineService.getWashingMachine(dormName,floorNumber,commonSpaceNumber,washingMachineNumber);
-        List<WashingReservation> washingReservations = washingMachine.getWashingReservations();
-        if(washingReservations.stream()
-                .anyMatch(washingReservation1 -> washingReservation1.collide(washingReservation)))
-            throw new WashingReservationCollideException(LocalDateTime.of(washingReservation.getDate(),washingReservation.getStart()));
-        washingReservations.add(washingReservation);
-        washingMachine.setWashingReservations(washingReservations);
-        washingReservationRepository.save(washingReservation);
-        return washingReservations;
-    }*/
-
     public List<WashingReservation> saveWashingReservation(String userEmail, WashingReservationDto washingReservationsDto){
         UserDao user = userRepository.findByEmail(userEmail);
         WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingReservationsDto.getWashingMachineId());
@@ -161,9 +148,7 @@ public class WashingReservationService {
     }
 
     public WashingReservation updateWashingReservationById(long id, WashingReservation newWashingReservation){
-        WashingReservation washingReservation = washingReservationRepository.findById(id);
-        if(washingReservation == null)
-            throw new WashingReservationNotFoundException(id);
+        WashingReservation washingReservation = this.getWashingReservationById(id);
         if(newWashingReservation.getStatus()!=null)
             washingReservation.setStatus(newWashingReservation.getStatus());
         if(newWashingReservation.getStart()!=null)
@@ -176,9 +161,7 @@ public class WashingReservationService {
     }
 
     public void deleteWashingReservationById(long id){
-        WashingReservation washingReservation =washingReservationRepository.findById(id);
-        if(washingReservation == null)
-            throw new  WashingReservationNotFoundException(id);
+        WashingReservation washingReservation = this.getWashingReservationById(id);
         washingReservationRepository.delete(washingReservation);
     }
 

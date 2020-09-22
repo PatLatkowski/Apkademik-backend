@@ -21,7 +21,6 @@ public class NoticeBoardController {
     @Autowired
     NoticeBoardService noticeBoardService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/noticeBoard")
     public ResponseEntity<?> addNoticeBoard(@RequestBody NoticeBoard noticeBoard){
         return ResponseEntity.ok(noticeBoardService.saveNoticeBoard(noticeBoard));

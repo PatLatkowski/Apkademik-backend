@@ -2,6 +2,7 @@ package pl.edu.pg.apkademikbackend.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.WebSecurity.RoleService;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
@@ -64,7 +65,10 @@ public class UserController {
     }
     @GetMapping("/user/{userId}/floor")
     public ResponseEntity<?> getFloorFromUser(@PathVariable long userId){
-
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(userDetailsService.getFloor(userId));
+    }
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(){
+        return ResponseEntity.ok(userDetailsService.getAllUsers());
     }
 }

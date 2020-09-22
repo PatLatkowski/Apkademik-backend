@@ -51,7 +51,7 @@ public class FloorService {
         Floor floor = this.getFloorById(id);
         if(updatedFloor.getNumber()!=0)
             floor.setNumber(updatedFloor.getNumber());
-        return floor;
+        return floorRepository.save(floor);
     }
 
     public void deleteFloor(long id){

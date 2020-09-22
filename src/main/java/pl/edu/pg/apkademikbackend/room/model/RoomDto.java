@@ -3,7 +3,7 @@ package pl.edu.pg.apkademikbackend.room.model;
 
 public class RoomDto {
     private long floorId;
-    private Integer number;
+    private String number;
     private int size;
 
     public long getFloorId() {
@@ -14,11 +14,11 @@ public class RoomDto {
         this.floorId = floorId;
     }
 
-    public Integer getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(Integer number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

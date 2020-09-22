@@ -13,6 +13,7 @@ import pl.edu.pg.apkademikbackend.WebSecurity.config.JwtTokenUtil;
 import pl.edu.pg.apkademikbackend.WebSecurity.exceptions.InvalidPasswordException;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
 import pl.edu.pg.apkademikbackend.dorm.DormService;
+import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
@@ -21,6 +22,7 @@ import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -137,5 +139,13 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     public Set<Role> getRoles(long id){
         return userRepository.findById(id).getRoles();
+    }
+
+    public Floor getFloor(long userId){
+        return this.getUser(userId).getRoom().getFloor();
+    }
+
+    public List<UserDao> getAllUsers(){
+        return userRepository.findAll();
     }
 }

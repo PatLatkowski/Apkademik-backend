@@ -1,4 +1,4 @@
-package pl.edu.pg.apkademikbackend.washingReservation.model;
+package pl.edu.pg.apkademikbackend.CommonSpaceReservation.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -8,20 +8,20 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
 @Entity
-@Table(name="washing_reservation")
-public class WashingReservation {
+@Table(name="common_space_reservation")
+public class CommonSpaceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
-    private WashingReservationStatus status;
+    private CommonSpaceReservationStatus status;
     @Column
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     @JsonDeserialize(using = LocalTimeDeserializer.class)
@@ -38,9 +38,6 @@ public class WashingReservation {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate date;
 
-    public WashingReservation() {
-    }
-
     public long getId() {
         return id;
     }
@@ -49,11 +46,11 @@ public class WashingReservation {
         this.id = id;
     }
 
-    public WashingReservationStatus getStatus() {
+    public CommonSpaceReservationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(WashingReservationStatus status) {
+    public void setStatus(CommonSpaceReservationStatus status) {
         this.status = status;
     }
 
@@ -81,9 +78,9 @@ public class WashingReservation {
         this.date = date;
     }
 
-    public boolean collide(WashingReservation washingReservation){
-        if(!this.getDate().equals(washingReservation.getDate()))
+    public boolean collide(CommonSpaceReservation commonSpaceReservation){
+        if(!this.getDate().equals(commonSpaceReservation.getDate()))
             return false;
-        else return this.getStart().equals(washingReservation.getStart());
+        else return this.getStart().equals(commonSpaceReservation.getStart());
     }
 }

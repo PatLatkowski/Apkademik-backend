@@ -54,4 +54,9 @@ public class RoomController {
     public ResponseEntity<?> getUsersFromRoom(@PathVariable long roomId){
         return ResponseEntity.ok(roomService.getUsersFromRoom(roomId));
     }
+
+    @GetMapping("/freeRooms")
+    public ResponseEntity<?> getAllFreeRooms(){
+        return ResponseEntity.ok(roomService.getAllRomsWithLeftSpace());
+    }
 }

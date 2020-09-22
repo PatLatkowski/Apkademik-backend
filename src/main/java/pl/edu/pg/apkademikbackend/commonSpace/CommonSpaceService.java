@@ -9,7 +9,9 @@ import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpaceDto;
 import pl.edu.pg.apkademikbackend.commonSpace.repository.CommonSpaceRepository;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
+import pl.edu.pg.apkademikbackend.floor.model.FloorAndCommonSpaces;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -70,6 +72,15 @@ public class CommonSpaceService {
         if(newCommonSpace.getType()!=null)
             commonSpace.setType(newCommonSpace.getType());
         return commonSpaceRepository.save(commonSpace);
+    }
+
+    public List<FloorAndCommonSpaces> getAllCommonSpacesFromDorm(long dormId){
+        List<FloorAndCommonSpaces> floorAndCommonSpaces = new ArrayList<>();
+        for (Floor floor:
+             floorService.getAllFloorsFromDorm(dormId)) {
+            floorAndCommonSpaces.add(new FloorAndCommonSpaces(floor.getId(),floor.getNumber(),floor.getCommonSpaces()));
+        }
+        return floorAndCommonSpaces;
     }
 
 }

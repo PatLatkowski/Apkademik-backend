@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.pg.apkademikbackend.commonSpace.CommonSpaceService;
+import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
 import pl.edu.pg.apkademikbackend.dorm.DormService;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
+import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,18 +24,15 @@ public class DormController {
     private JwtUserDetailsService userDetailsService;
     @Autowired
     private FloorService floorService;
+    @Autowired
+    private RoomService roomService;
+    @Autowired
+    private CommonSpaceService commonSpaceService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/dorm")
     public ResponseEntity<?> addDorm(@RequestBody Dorm dorm){
         return ResponseEntity.ok(dormService.saveDorm(dorm));
     }
-
-    /*@PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/dorm/{dormName}")
-    public ResponseEntity<?> getDorm(@PathVariable String dormName){
-        return ResponseEntity.ok(dormService.getDorm(dormName));
-    }*/
 
     @GetMapping("/dorm")
     public ResponseEntity<?> getDorm(HttpServletRequest request){
@@ -69,5 +69,19 @@ public class DormController {
     @GetMapping("/dorm/{id}/floors")
     public ResponseEntity<?> getAllFloorsFromDorm(@PathVariable long id){
         return ResponseEntity.ok(floorService.getAllFloorsFromDorm(id));
+    }
+
+    @GetMapping("/dorm/{dormId}/rooms")
+    public ResponseEntity<?> getAllRoomsFromDorm(@PathVariable long dormId){
+        return ResponseEntity.ok(roomService.getAllRoomsFromDorm(dormId));
+    }
+    @GetMapping("/dorm/{dormId}/commonSpaces")
+    public ResponseEntity<?> getAllCommonSpacesFromDorm(@PathVariable long dormId){
+        return ResponseEntity.ok(commonSpaceService.getAllCommonSpacesFromDorm(dormId));
+    }
+
+    @GetMapping("/dorm/{dormId}/freeRooms")
+    public ResponseEntity<?> getAllFreeRoomsFromDorm(@PathVariable long dormId){
+        return ResponseEntity.ok(roomService.getAllRoomsWithLeftSpaceFromDorm(dormId));
     }
 }

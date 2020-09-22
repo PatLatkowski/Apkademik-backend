@@ -7,6 +7,7 @@ import pl.edu.pg.apkademikbackend.dorm.exception.DormNotFoundException;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.dorm.repository.DormRepository;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import java.util.List;
@@ -60,10 +61,8 @@ public class DormService {
     }
 
     public Dorm getDormByUserEmail(String email){
-        Dorm dorm = userRepository.findByEmail(email).getDorm();
-        if(dorm == null)
-            throw new DormNotFoundException(0);
-        return dorm;
+        UserDao user = userRepository.findByEmail(email);
+        return this.getDormById(user.getDorm().getId());
     }
 
     public List<Dorm> getAllDorms(){

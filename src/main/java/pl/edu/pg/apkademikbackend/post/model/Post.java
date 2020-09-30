@@ -25,6 +25,8 @@ public class Post {
     private  String text;
     @Column
     private  LocalDateTime date;
+    @Column
+    private Integer page;
 
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
@@ -68,7 +70,14 @@ public class Post {
         this.date=date;
     }
 
-    public UserDao getUsers(){
+    public Integer getPage(){
+        return page;
+    }
+    public void setPage(Integer page){
+        this.page=page;
+    }
+
+    public UserDao getUser(){
         return user;
     }
     public void setUser(UserDao user){

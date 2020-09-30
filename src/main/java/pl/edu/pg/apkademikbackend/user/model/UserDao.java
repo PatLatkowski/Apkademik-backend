@@ -5,6 +5,7 @@ import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
 import pl.edu.pg.apkademikbackend.comment.model.Comment;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.model.CommonSpaceReservation;
+import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.room.model.Room;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
@@ -37,6 +38,13 @@ public class UserDao {
             @JoinColumn(name = "ROLE_ID") })
     @JsonIgnore
     private Set<Role> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "USER_NOTICEBOARD", joinColumns = {
+            @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
+            @JoinColumn(name = "NOTICEBOARD_ID") })
+    @JsonIgnore
+    private Set<NoticeBoard> noticeBoard;
 
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true
@@ -121,6 +129,15 @@ public class UserDao {
         this.roles = roles;
     }
 
+
+    public Set<NoticeBoard> getNoticeBoard() {
+        return noticeBoard;
+    }
+
+    public void setNoticeBoard(Set<NoticeBoard> noticeBoard) {
+        this.noticeBoard = noticeBoard;
+    }
+
     public List<WashingReservation> getWashingReservations() {
         return washingReservations;
     }
@@ -144,6 +161,7 @@ public class UserDao {
     public void setPosts(List<Post> posts) {
         this.posts = posts;
     }
+
     public List<Comment> getComments() {
         return comments;
     }

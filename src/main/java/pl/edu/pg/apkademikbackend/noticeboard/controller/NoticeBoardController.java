@@ -2,14 +2,12 @@ package pl.edu.pg.apkademikbackend.noticeboard.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
-import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.noticeboard.NoticeBoardService;
-import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardAlreadyExistException;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 import pl.edu.pg.apkademikbackend.noticeboard.repository.NoticeBoardRepository;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -25,7 +23,6 @@ public class NoticeBoardController {
     public ResponseEntity<?> addNoticeBoard(@RequestBody NoticeBoard noticeBoard){
         return ResponseEntity.ok(noticeBoardService.saveNoticeBoard(noticeBoard));
     }
-
 
     @GetMapping("/noticeBoard/{id}")
     public ResponseEntity<?>getNoticeBoardById(@PathVariable long id){
@@ -43,5 +40,9 @@ public class NoticeBoardController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/noticeBoard/{noticeBoard}/member")
+    public ResponseEntity<?>amIMemberOfNoticeBoard(@PathVariable String noticeBoard, HttpServletRequest request){
+        return ResponseEntity.ok(noticeBoardService.amImemberOfNoticeBoard(noticeBoard,request));
+    }
 
 }

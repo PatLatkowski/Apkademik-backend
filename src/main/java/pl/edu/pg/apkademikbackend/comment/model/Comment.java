@@ -18,11 +18,11 @@ public class Comment {
     @Column
     private LocalDateTime date;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "post_id",referencedColumnName = "id")
     private Post post;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserDao user;
 

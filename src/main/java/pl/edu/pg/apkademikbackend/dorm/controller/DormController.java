@@ -61,9 +61,14 @@ public class DormController {
         return ResponseEntity.ok(dormService.getAllDorms());
     }
 
-    @GetMapping("/dorm/{id}/noticeboards")
+    @GetMapping("/dorm/noticeBoards")
+    public ResponseEntity<?> getNoticeBoards(HttpServletRequest request){
+        return ResponseEntity.ok(dormService.getNoticeBoards(request));
+    }
+
+    @GetMapping("/dorm/{id}/noticeBoards")
     public ResponseEntity<?> getAllNoticeBoardsFromDorm(@PathVariable long id){
-        return ResponseEntity.ok(dormService.getAllDorms());
+        return ResponseEntity.ok(dormService.getAllNoticeBoards(id));
     }
 
     @GetMapping("/dorm/{id}/floors")

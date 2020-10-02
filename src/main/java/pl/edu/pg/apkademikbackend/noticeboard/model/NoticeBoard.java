@@ -1,13 +1,15 @@
 package pl.edu.pg.apkademikbackend.noticeboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import pl.edu.pg.apkademikbackend.comment.model.Comment;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
+import pl.edu.pg.apkademikbackend.post.model.Post;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class NoticeBoard {
 
     @Id
@@ -19,8 +21,13 @@ public class NoticeBoard {
 
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "dorm_id",referencedColumnName = "id")
-    @JsonIgnore
     private Dorm dorm;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JoinColumn(name = "noticeBoard_id")
+    @JsonIgnore
+    private List<Post> posts = new ArrayList<>();
 
     public long getId(){
         return id;
@@ -42,4 +49,11 @@ public class NoticeBoard {
     public void setDorm(Dorm dorm){
            this.dorm=dorm;
        }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
 }

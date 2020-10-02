@@ -2,11 +2,15 @@ package pl.edu.pg.apkademikbackend.post.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import pl.edu.pg.apkademikbackend.comment.model.Comment;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Post {
@@ -21,14 +25,22 @@ public class Post {
     private  String text;
     @Column
     private  LocalDateTime date;
+    @Column
+    private Integer page;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserDao user;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "noticeBoard_id",referencedColumnName = "id")
     private NoticeBoard noticeBoard;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
 
     public long getId(){
         return id;
@@ -58,7 +70,14 @@ public class Post {
         this.date=date;
     }
 
-    public UserDao getUsers(){
+    public Integer getPage(){
+        return page;
+    }
+    public void setPage(Integer page){
+        this.page=page;
+    }
+
+    public UserDao getUser(){
         return user;
     }
     public void setUser(UserDao user){
@@ -72,7 +91,11 @@ public class Post {
         this.noticeBoard=noticeBoard;
     }
 
-    public UserDao getUser() {
-        return user;
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

@@ -2,7 +2,6 @@ package pl.edu.pg.apkademikbackend.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.edu.pg.apkademikbackend.dorm.DormService;
 import pl.edu.pg.apkademikbackend.floor.FloorService;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.floor.model.FloorAndRooms;
@@ -22,17 +21,17 @@ import java.util.stream.Collectors;
 
 @Component
 public class RoomService {
-    @Autowired
-    private RoomRepository roomRepository;
-    @Autowired
-    private FloorService floorService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private final RoomRepository roomRepository;
+    private final FloorService floorService;
+    private final UserRepository userRepository;
+    private final JwtUserDetailsService userDetailsService;
 
-    public List<Room> getRooms(long id){
-        return floorService.getFloorById(id).getRooms();
+    @Autowired
+    public RoomService(RoomRepository roomRepository, FloorService floorService, UserRepository userRepository, JwtUserDetailsService userDetailsService) {
+        this.roomRepository = roomRepository;
+        this.floorService = floorService;
+        this.userRepository = userRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     public Room getRoom(long id){
@@ -104,7 +103,7 @@ public class RoomService {
     }
 
     public List<FloorAndRooms> getAllRoomsWithLeftSpaceFromDorm(long dormId){
-        List<FloorAndRooms> allRoomsFromDorm = getAllRoomsFromDorm(dormId);
+        List<FloorAndRooms> allRoomsFromDorm = this.getAllRoomsFromDorm(dormId);
         for (FloorAndRooms floorAndRoom:
              allRoomsFromDorm) {
             List<Room> updatedRoomsList = floorAndRoom.getRooms().stream()

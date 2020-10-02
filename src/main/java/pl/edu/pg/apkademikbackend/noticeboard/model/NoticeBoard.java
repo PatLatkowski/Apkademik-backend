@@ -1,10 +1,13 @@
 package pl.edu.pg.apkademikbackend.noticeboard.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 
 import javax.persistence.*;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class NoticeBoard {
 
     @Id
@@ -16,6 +19,7 @@ public class NoticeBoard {
 
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "dorm_id",referencedColumnName = "id")
+    @JsonIgnore
     private Dorm dorm;
 
     public long getId(){
@@ -38,5 +42,4 @@ public class NoticeBoard {
     public void setDorm(Dorm dorm){
            this.dorm=dorm;
        }
-
 }

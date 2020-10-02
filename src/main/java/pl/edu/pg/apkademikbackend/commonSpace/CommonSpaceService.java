@@ -1,7 +1,7 @@
 package pl.edu.pg.apkademikbackend.commonSpace;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceAlreadyExistException;
 import pl.edu.pg.apkademikbackend.commonSpace.exception.CommonSpaceNotFoundException;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
@@ -14,12 +14,17 @@ import pl.edu.pg.apkademikbackend.floor.model.FloorAndCommonSpaces;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class CommonSpaceService {
+
+    private final CommonSpaceRepository commonSpaceRepository;
+    private final FloorService floorService;
+
     @Autowired
-    private CommonSpaceRepository commonSpaceRepository;
-    @Autowired
-    private FloorService floorService;
+    public CommonSpaceService(CommonSpaceRepository commonSpaceRepository, FloorService floorService) {
+        this.commonSpaceRepository = commonSpaceRepository;
+        this.floorService = floorService;
+    }
 
     public CommonSpace getCommonSpaceById(long id){
         CommonSpace commonSpace = commonSpaceRepository.findById(id);

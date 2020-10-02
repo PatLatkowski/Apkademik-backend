@@ -14,14 +14,15 @@ import java.util.List;
 
 @Component
 public class FloorService {
-    @Autowired
-    FloorRepository floorRepository;
-    @Autowired
-    DormService dormService;
 
-    public List<Floor> getFloors(long dormId){
-        return dormService.getDormById(dormId)
-                .getFloors();
+    private final FloorRepository floorRepository;
+
+    private final DormService dormService;
+
+    @Autowired
+    public FloorService(FloorRepository floorRepository, DormService dormService) {
+        this.floorRepository = floorRepository;
+        this.dormService = dormService;
     }
 
     public Floor getFloorById(long id){

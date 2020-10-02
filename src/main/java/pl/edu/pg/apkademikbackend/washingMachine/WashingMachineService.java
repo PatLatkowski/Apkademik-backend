@@ -9,32 +9,26 @@ import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineAlready
 import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineNotFoundException;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineDto;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineStatus;
 import pl.edu.pg.apkademikbackend.washingMachine.repository.WashingMachineRepository;
 
 import java.util.List;
 
 @Component
 public class WashingMachineService {
-    @Autowired
-    private WashingMachineRepository washingMachineRepository;
+    private final WashingMachineRepository washingMachineRepository;
+    private final CommonSpaceService commonSpaceService;
 
     @Autowired
-    private CommonSpaceService commonSpaceService;
+    public WashingMachineService(WashingMachineRepository washingMachineRepository, CommonSpaceService commonSpaceService) {
+        this.washingMachineRepository = washingMachineRepository;
+        this.commonSpaceService = commonSpaceService;
+    }
 
-    /*public List<WashingMachine> getWashingMachines(String dormName, Integer floorNumber, Integer commonSpaceNumber){
-        return commonSpaceService.getCommonSpace(dormName,floorNumber,commonSpaceNumber)
-                .getWashingMachines();
-    }*/
     public List<WashingMachine> getWashingMachines(long commonSpaceId){
         return commonSpaceService.getCommonSpaceById(commonSpaceId)
                 .getWashingMachines();
     }
-    /*public WashingMachine getWashingMachine(String dormName, Integer floorNumber, Integer commonSpaceNumber, Integer washingMachineNumber){
-        return this.getWashingMachines(dormName,floorNumber,commonSpaceNumber).stream()
-                .filter(washingMachine1 -> washingMachineNumber == washingMachine1.getNumber())
-                .findAny()
-                .orElseThrow(() -> new WashingMachineNotFoundException(washingMachineNumber));
-    }*/
 
     public List<WashingMachine> saveWashingMachine(WashingMachineDto washingMachine){
         CommonSpace commonSpace = commonSpaceService.getCommonSpaceById(washingMachine.getCommonSpaceId());
@@ -76,5 +70,10 @@ public class WashingMachineService {
         washingMachineRepository.delete(washingMachine);
     }
 
+    public void updateWashingMachineStatus(long id, WashingMachineStatus status){
+        WashingMachine washingMachineById = this.getWashingMachineById(id);
+        washingMachineById.setStatus(status);
+        washingMachineRepository.save(washingMachineById);
+    }
 
 }

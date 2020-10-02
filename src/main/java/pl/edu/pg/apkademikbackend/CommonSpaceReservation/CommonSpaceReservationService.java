@@ -7,13 +7,12 @@ import pl.edu.pg.apkademikbackend.CommonSpaceReservation.exception.CommonSpaceRe
 import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservation;
 import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservationDto;
 import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservationWithMineAndCounter;
-import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservationsByDate;
+import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservationsFromDay;
 import pl.edu.pg.apkademikbackend.CommonSpaceReservation.repository.CommonSpaceReservationRepository;
 import pl.edu.pg.apkademikbackend.commonSpace.CommonSpaceService;
 import pl.edu.pg.apkademikbackend.commonSpace.model.CommonSpace;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
-import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,12 +24,17 @@ import java.util.stream.Collectors;
 
 @Component
 public class CommonSpaceReservationService {
+    private final CommonSpaceReservationRepository commonSpaceReservationRepository;
+    private final JwtUserDetailsService userDetailsService;
+    private final CommonSpaceService commonSpaceService;
+
     @Autowired
-    private CommonSpaceReservationRepository commonSpaceReservationRepository;
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
-    @Autowired
-    private CommonSpaceService commonSpaceService;
+    public CommonSpaceReservationService(CommonSpaceReservationRepository commonSpaceReservationRepository, JwtUserDetailsService userDetailsService,
+                                         CommonSpaceService commonSpaceService) {
+        this.commonSpaceReservationRepository = commonSpaceReservationRepository;
+        this.userDetailsService = userDetailsService;
+        this.commonSpaceService = commonSpaceService;
+    }
 
     public CommonSpaceReservation getCommonSpaceReservationById(long id){
         CommonSpaceReservation commonSpaceReservation = commonSpaceReservationRepository.findById(id);
@@ -75,18 +79,18 @@ public class CommonSpaceReservationService {
         return commonSpaceReservationRepository.save(commonSpaceReservation);
     }
 
-    public List<CommonSpaceReservationsByDate> getCommonSpaceReservationsFromFiveDays(String email, long id, LocalDate date){
+    public List<CommonSpaceReservationsFromDay> getCommonSpaceReservationsFromFiveDays(String email, long commonSpaceId, LocalDate date){
         UserDao user = userDetailsService.getUser(email);
-        List<CommonSpaceReservation> allCommonSpaceReservations = commonSpaceService.getCommonSpaceById(id).getCommonSpaceReservations().stream()
+        List<CommonSpaceReservation> allCommonSpaceReservations = commonSpaceService.getCommonSpaceById(commonSpaceId).getCommonSpaceReservations().stream()
                 .filter(commonSpaceReservation -> isWithinTwoDays(commonSpaceReservation.getDate(),date))
                 .sorted(Comparator.comparing(CommonSpaceReservation::getDate).thenComparing(CommonSpaceReservation::getStart))
                 .collect(Collectors.toList());
-        List<CommonSpaceReservationsByDate> reservationsByDates = new ArrayList<>();
-        reservationsByDates.add(new CommonSpaceReservationsByDate(date.minus(2,ChronoUnit.DAYS)));
-        reservationsByDates.add(new CommonSpaceReservationsByDate(date.minus(1,ChronoUnit.DAYS)));
-        reservationsByDates.add(new CommonSpaceReservationsByDate(date));
-        reservationsByDates.add(new CommonSpaceReservationsByDate(date.plus(1,ChronoUnit.DAYS)));
-        reservationsByDates.add(new CommonSpaceReservationsByDate(date.plus(2,ChronoUnit.DAYS)));
+        List<CommonSpaceReservationsFromDay> reservationsByDates = new ArrayList<>();
+        reservationsByDates.add(new CommonSpaceReservationsFromDay(date.minus(2,ChronoUnit.DAYS)));
+        reservationsByDates.add(new CommonSpaceReservationsFromDay(date.minus(1,ChronoUnit.DAYS)));
+        reservationsByDates.add(new CommonSpaceReservationsFromDay(date));
+        reservationsByDates.add(new CommonSpaceReservationsFromDay(date.plus(1,ChronoUnit.DAYS)));
+        reservationsByDates.add(new CommonSpaceReservationsFromDay(date.plus(2,ChronoUnit.DAYS)));
 
         for(CommonSpaceReservation commonSpaceReservation:
         allCommonSpaceReservations){
@@ -100,7 +104,7 @@ public class CommonSpaceReservationService {
         List<CommonSpaceReservation> myReservations = user.getCommonSpaceReservations();
         for(CommonSpaceReservation commonSpaceReservation:
         myReservations){
-            for (CommonSpaceReservationsByDate commonSpaceReservationByDate:
+            for (CommonSpaceReservationsFromDay commonSpaceReservationByDate:
                  reservationsByDates) {
                 if(commonSpaceReservation.getDate().equals(commonSpaceReservationByDate.getDate()))
                     commonSpaceReservationByDate.getReservations().stream()

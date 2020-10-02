@@ -4,6 +4,14 @@ public class FloorDto {
     private long dormId;
     private Integer number;
 
+    public FloorDto() {
+    }
+
+    public FloorDto(long dormId, Integer number) {
+        this.dormId = dormId;
+        this.number = number;
+    }
+
     public long getDormId() {
         return dormId;
     }

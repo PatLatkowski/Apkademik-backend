@@ -71,4 +71,8 @@ public class Post {
     public void setNoticeBoard(NoticeBoard noticeBoard){
         this.noticeBoard=noticeBoard;
     }
+
+    public UserDao getUser() {
+        return user;
+    }
 }

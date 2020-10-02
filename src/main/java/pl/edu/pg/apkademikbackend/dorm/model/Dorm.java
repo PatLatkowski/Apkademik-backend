@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.dorm.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name="dorm")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Dorm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +37,16 @@ public class Dorm {
     @JoinColumn(name = "dorm_id")
     @JsonIgnore
     private List<NoticeBoard> noticeBoards  = new ArrayList<>();
+
+    public Dorm() {
+    }
+
+    public Dorm(long id, String name, String address, int floorCount) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.floorCount = floorCount;
+    }
 
     public long getId() {
         return id;

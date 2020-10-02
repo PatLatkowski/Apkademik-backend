@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.washingMachine.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name="washing_machine")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class WashingMachine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,4 +61,5 @@ public class WashingMachine {
     public void addWashingReservations(List<WashingReservation> newWashingReservations){
         this.washingReservations.addAll(newWashingReservations);
     }
+
 }

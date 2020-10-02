@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.room.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name="room")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,4 +79,5 @@ public class Room {
     public void setFloor(Floor floor) {
         this.floor = floor;
     }
+
 }

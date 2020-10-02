@@ -18,9 +18,11 @@ import pl.edu.pg.apkademikbackend.room.RoomService;
 import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.model.UserDto;
+import pl.edu.pg.apkademikbackend.user.model.UserWithRoles;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,18 +31,15 @@ import java.util.Set;
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder bcryptEncoder;
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
     @Autowired
     private DormService dormService;
-
     @Autowired
     private RoomService roomService;
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UserNotFoundException {
@@ -49,7 +48,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UserNotFoundException(email);
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-                getAuthority(user));
+                this.getAuthority(user));
     }
 
     private Set<GrantedAuthority> getAuthority(UserDao user) {
@@ -147,5 +146,12 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     public List<UserDao> getAllUsers(){
         return userRepository.findAll();
+    }
+
+    public List<UserWithRoles> getAllUsersWithRoles(){
+        List<UserDao> allUsers = userRepository.findAll();
+        List<UserWithRoles> usersWithRoles = new ArrayList<>();
+        allUsers.forEach(userDao -> usersWithRoles.add(new UserWithRoles(userDao.getId(),userDao.getName(),userDao.getSurname(),userDao.getEmail(),userDao.getRoles())));
+        return usersWithRoles;
     }
 }

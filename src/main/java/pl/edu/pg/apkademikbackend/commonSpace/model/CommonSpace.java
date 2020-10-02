@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.commonSpace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservation;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name="common_space")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class CommonSpace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +42,16 @@ public class CommonSpace {
     @JoinColumn(name = "common_space_id")
     @JsonIgnore
     private List<CommonSpaceReservation> commonSpaceReservations  = new ArrayList<>();
+
+    public CommonSpace() {
+    }
+
+    public CommonSpace(int number, int size, String name, CommonSpaceType type) {
+        this.number = number;
+        this.size = size;
+        this.name = name;
+        this.type = type;
+    }
 
     public long getId() {
         return id;
@@ -120,5 +132,7 @@ public class CommonSpace {
     public void removeCommonSpaceReservation(CommonSpaceReservation commonSpaceReservation){
         this.commonSpaceReservations.remove(commonSpaceReservation);
     }
+
+    
 
 }

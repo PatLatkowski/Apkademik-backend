@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class StartingHour {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
@@ -37,5 +38,19 @@ public class StartingHour {
 
     public void setMine(boolean mine) {
         isMine = mine;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StartingHour that = (StartingHour) o;
+        return isMine == that.isMine &&
+                Objects.equals(startingHour, that.startingHour);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startingHour, isMine);
     }
 }

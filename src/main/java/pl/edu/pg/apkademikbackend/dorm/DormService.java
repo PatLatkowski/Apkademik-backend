@@ -7,23 +7,22 @@ import pl.edu.pg.apkademikbackend.dorm.exception.DormNotFoundException;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.dorm.repository.DormRepository;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
-import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 
 import java.util.List;
 
 @Component
 public class DormService {
-    @Autowired
-    private DormRepository dormRepository;
-    @Autowired
-    private UserRepository userRepository;
 
-    public Dorm getDorm(String dormName){
-        Dorm dorm = dormRepository.findByName(dormName);
-        if(dorm == null)
-            throw new DormNotFoundException(dormName);
-        return dorm;
+    private final DormRepository dormRepository;
+
+    private final JwtUserDetailsService userDetailsService;
+
+    @Autowired
+    public DormService(DormRepository dormRepository, JwtUserDetailsService userDetailsService) {
+        this.dormRepository = dormRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     public Dorm saveDorm(Dorm dorm){
@@ -41,9 +40,7 @@ public class DormService {
     }
 
     public Dorm updateDormById(long id, Dorm newDorm){
-        Dorm dorm = dormRepository.findById(id);
-        if(dorm == null)
-            throw new DormNotFoundException(id);
+        Dorm dorm = this.getDormById(id);
         if(newDorm.getName()!=null)
             dorm.setName(newDorm.getName());
         if(newDorm.getAddress()!=null)
@@ -54,14 +51,12 @@ public class DormService {
     }
 
     public void deleteDormById(long id){
-        Dorm dorm = dormRepository.findById(id);
-        if(dorm == null)
-            throw new DormNotFoundException(id);
+        Dorm dorm = this.getDormById(id);
         dormRepository.delete(dorm);
     }
 
     public Dorm getDormByUserEmail(String email){
-        UserDao user = userRepository.findByEmail(email);
+        UserDao user = userDetailsService.getUser(email);
         return this.getDormById(user.getDorm().getId());
     }
 

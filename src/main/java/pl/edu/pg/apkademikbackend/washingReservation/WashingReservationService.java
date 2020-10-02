@@ -9,11 +9,13 @@ import pl.edu.pg.apkademikbackend.dorm.exception.DormNotFoundException;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.floor.model.Floor;
 import pl.edu.pg.apkademikbackend.floor.model.FloorWithWashingMachines;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
-import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 import pl.edu.pg.apkademikbackend.washingMachine.WashingMachineService;
+import pl.edu.pg.apkademikbackend.washingMachine.exception.WashingMachineUnavailableException;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachine;
 import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineActualReservationsDOT;
+import pl.edu.pg.apkademikbackend.washingMachine.model.WashingMachineStatus;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationCollideException;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationNotFoundException;
 import pl.edu.pg.apkademikbackend.washingReservation.model.*;
@@ -30,12 +32,16 @@ import java.util.stream.Collectors;
 
 @Component
 public class WashingReservationService {
+    private final WashingReservationRepository washingReservationRepository;
+    private final WashingMachineService washingMachineService;
+    private final JwtUserDetailsService userDetailsService;
+
     @Autowired
-    private WashingReservationRepository washingReservationRepository;
-    @Autowired
-    private WashingMachineService washingMachineService;
-    @Autowired
-    private UserRepository userRepository;
+    public WashingReservationService(WashingReservationRepository washingReservationRepository, WashingMachineService washingMachineService, JwtUserDetailsService userDetailsService) {
+        this.washingReservationRepository = washingReservationRepository;
+        this.washingMachineService = washingMachineService;
+        this.userDetailsService = userDetailsService;
+    }
 
     public List<WashingReservation> getWashingReservations(long washingMachineId, LocalDate localDate){
         WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingMachineId);
@@ -45,8 +51,10 @@ public class WashingReservationService {
     }
 
     public List<WashingReservation> saveWashingReservation(String userEmail, WashingReservationDto washingReservationsDto){
-        UserDao user = userRepository.findByEmail(userEmail);
+        UserDao user = userDetailsService.getUser(userEmail);
         WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingReservationsDto.getWashingMachineId());
+        if(washingMachine.getStatus() == WashingMachineStatus.UNAVAILABLE)
+            throw new WashingMachineUnavailableException(washingMachine.getId());
         List<WashingReservation> washingReservationsNow = washingMachine.getWashingReservations();
         List<WashingReservation> washingReservations = washingReservationsDto.getWashingReservations();
         for (WashingReservation washingReservation:
@@ -60,17 +68,17 @@ public class WashingReservationService {
         return washingReservationRepository.saveAll(washingReservations);
     }
 
-    public List<FloorWithWashingMachines> getWashingReservationsFromCommonSpaceByDate(String userEmail, LocalDate date){
-        UserDao user = userRepository.findByEmail(userEmail);
+    public List<FloorWithWashingMachines> getWashingReservationsFromAllCommonSpacesByDate(String userEmail, LocalDate date){
+        UserDao user = userDetailsService.getUser(userEmail);
         Dorm dorm = user.getDorm();
         if(dorm == null)
             throw new DormNotFoundException(0);
         List<FloorWithWashingMachines> floorWithWashingMachines = new ArrayList<>();
         for (Floor floor1:
                 dorm.getFloors()) {
+            List<CommonSpacesWithWashingMachines> laundries = new ArrayList<>();
             for (CommonSpace commonSpace:
                     floor1.getCommonSpaces()) {
-                List<CommonSpacesWithWashingMachines> laundries = new ArrayList<>();
                 if(commonSpace.getType() == CommonSpaceType.LAUNDRY){
                     List<WashingMachineActualReservationsDOT> washingMachinesToSend = new ArrayList<>();
                     for (WashingMachine washingMachine:
@@ -96,14 +104,14 @@ public class WashingReservationService {
                     }
                     laundries.add(new CommonSpacesWithWashingMachines(commonSpace,washingMachinesToSend));
                 }
-                floorWithWashingMachines.add(new FloorWithWashingMachines(floor1.getId(),floor1.getNumber(),laundries));
             }
+            floorWithWashingMachines.add(new FloorWithWashingMachines(floor1.getId(),floor1.getNumber(),laundries));
         }
         return floorWithWashingMachines;
     }
 
     public List<DateAndStartingHours> getWashingReservationFromFiveDays(String userEmail, long washingMachineId, LocalDate date) {
-        UserDao user = userRepository.findByEmail(userEmail);
+        UserDao user = userDetailsService.getUser(userEmail);
         WashingMachine washingMachine = washingMachineService.getWashingMachineById(washingMachineId);
         List<WashingReservation> washingReservationsWithinFiveDays = washingMachine.getWashingReservations().stream()
                 .filter(washingReservation -> isWithinTwoDays(washingReservation.getDate(),date))

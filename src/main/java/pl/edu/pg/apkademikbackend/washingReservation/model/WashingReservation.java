@@ -2,6 +2,7 @@ package pl.edu.pg.apkademikbackend.washingReservation.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -16,6 +17,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name="washing_reservation")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class WashingReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,4 +88,5 @@ public class WashingReservation {
             return false;
         else return this.getStart().equals(washingReservation.getStart());
     }
+
 }

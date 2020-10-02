@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DateAndStartingHours{
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -48,5 +49,19 @@ public class DateAndStartingHours{
 
     public void addStartingHours(StartingHour start){
         this.startingHours.add(start);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DateAndStartingHours that = (DateAndStartingHours) o;
+        return Objects.equals(date, that.date) &&
+                Objects.equals(startingHours, that.startingHours);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date, startingHours);
     }
 }

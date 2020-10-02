@@ -61,4 +61,8 @@ public class Comment {
     public void setUser(UserDao user){
         this.user=user;
     }
+
+    public UserDao getUser() {
+        return user;
+    }
 }

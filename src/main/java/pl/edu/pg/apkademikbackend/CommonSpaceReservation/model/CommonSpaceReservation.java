@@ -2,13 +2,13 @@ package pl.edu.pg.apkademikbackend.CommonSpaceReservation.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -16,6 +16,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name="common_space_reservation")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class CommonSpaceReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,4 +84,5 @@ public class CommonSpaceReservation {
             return false;
         else return this.getStart().equals(commonSpaceReservation.getStart());
     }
+
 }

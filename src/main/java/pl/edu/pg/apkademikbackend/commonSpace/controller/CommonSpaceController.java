@@ -35,7 +35,7 @@ public class CommonSpaceController {
     public ResponseEntity<?> getAllWashingReservationsByDate(HttpServletRequest request,
                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         String userEmail = userDetailsService.getUserEmailFromToken(request);
-        return ResponseEntity.ok(washingReservationService.getWashingReservationsFromCommonSpaceByDate(userEmail,date));
+        return ResponseEntity.ok(washingReservationService.getWashingReservationsFromAllCommonSpacesByDate(userEmail,date));
     }
 
     @GetMapping("/commonSpace/{id}")

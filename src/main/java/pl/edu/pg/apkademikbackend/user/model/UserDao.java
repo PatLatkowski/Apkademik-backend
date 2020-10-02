@@ -1,9 +1,10 @@
 package pl.edu.pg.apkademikbackend.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservation;
 import pl.edu.pg.apkademikbackend.WebSecurity.model.Role;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
-import pl.edu.pg.apkademikbackend.CommonSpaceReservation.model.CommonSpaceReservation;
 import pl.edu.pg.apkademikbackend.room.model.Room;
 import pl.edu.pg.apkademikbackend.washingReservation.model.WashingReservation;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @Entity
 @Table(name="user")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class UserDao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -158,4 +160,6 @@ public class UserDao {
         roles.add(role);
         return roles;
     }
+
+
 }

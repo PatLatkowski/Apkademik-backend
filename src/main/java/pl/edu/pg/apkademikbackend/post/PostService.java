@@ -2,15 +2,15 @@ package pl.edu.pg.apkademikbackend.post;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.edu.pg.apkademikbackend.noticeboard.NoticeBoardService;
 import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardNotFoundException;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
-import pl.edu.pg.apkademikbackend.noticeboard.repository.NoticeBoardRepository;
 import pl.edu.pg.apkademikbackend.post.exception.PostNotFoundException;
 import pl.edu.pg.apkademikbackend.post.exception.PostNotOnThisNoticeBoardException;
 import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.post.model.PostDto;
 import pl.edu.pg.apkademikbackend.post.repository.PostRepository;
-import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,23 +19,27 @@ import java.util.List;
 @Component
 public class PostService {
 
+    private final JwtUserDetailsService jwtUserDetailsService;
+
+    private final PostRepository postRepository;
+
+    private final NoticeBoardService noticeBoardService;
 
     @Autowired
-    private UserRepository userRepository;
+    public PostService( JwtUserDetailsService jwtUserDetailsService,PostRepository postRepository,NoticeBoardService noticeBoardService){
+        this.jwtUserDetailsService=jwtUserDetailsService;
+        this.postRepository=postRepository;
+        this.noticeBoardService=noticeBoardService;
 
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private NoticeBoardRepository noticeBoardRepository;
+    }
 
     public Post savePost(Post newPost,String noticeBoard, String userEmail){
         LocalDateTime date=LocalDateTime.now();
         newPost.setDate(date);
 
-        newPost.setUser(userRepository.findByEmail(userEmail));
+        newPost.setUser(jwtUserDetailsService.getUser(userEmail));
 
-        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -52,7 +56,7 @@ public class PostService {
     }
 
     public List<PostDto> getPosts(String noticeBoard){
-        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -67,7 +71,7 @@ public class PostService {
     }
 
     public List<PostDto> getPostsFromPage(String noticeBoard,Integer page){
-        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        NoticeBoard testNoticeBoard=noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -83,7 +87,7 @@ public class PostService {
 
     public PostDto getPost(long id,String noticeBoard, String userEmail ){
 
-        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -97,7 +101,7 @@ public class PostService {
 
         PostDto postDto=returnPostData(post);
 
-        if(post.getUser()==userRepository.findByEmail(userEmail))
+        if(post.getUser()== jwtUserDetailsService.getUser(userEmail))
             postDto.setIsAuthor(true);
 
         return postDto;
@@ -105,7 +109,7 @@ public class PostService {
     }
 
     public Integer getPages(String noticeBoard){
-        NoticeBoard testNoticeBoard= noticeBoardRepository.findByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 

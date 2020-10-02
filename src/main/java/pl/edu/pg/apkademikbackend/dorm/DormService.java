@@ -6,9 +6,11 @@ import pl.edu.pg.apkademikbackend.dorm.exception.DormAlreadyExistException;
 import pl.edu.pg.apkademikbackend.dorm.exception.DormNotFoundException;
 import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.dorm.repository.DormRepository;
+import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardNotFoundException;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
-import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Component
@@ -16,7 +18,7 @@ public class DormService {
     @Autowired
     private DormRepository dormRepository;
     @Autowired
-    private UserRepository userRepository;
+    private JwtUserDetailsService jwtUserDetailsService;
 
     public Dorm getDorm(String dormName){
         Dorm dorm = dormRepository.findByName(dormName);
@@ -60,7 +62,7 @@ public class DormService {
     }
 
     public Dorm getDormByUserEmail(String email){
-        Dorm dorm = userRepository.findByEmail(email).getDorm();
+        Dorm dorm = jwtUserDetailsService.getUser(email).getDorm();
         if(dorm == null)
             throw new DormNotFoundException(0);
         return dorm;
@@ -72,5 +74,19 @@ public class DormService {
 
     public List<NoticeBoard> getAllNoticeBoards(long id){
         return dormRepository.findById(id).getNoticeBoards();
+    }
+
+    public List<NoticeBoard> getNoticeBoards( HttpServletRequest request){
+        String userEmail=jwtUserDetailsService.getUserEmailFromToken(request);
+
+        Dorm dorm =getDormByUserEmail(userEmail);
+        if(dorm==null)
+            throw new DormNotFoundException(0);
+
+        List<NoticeBoard> noticeBoards=dorm.getNoticeBoards();
+        if(noticeBoards==null)
+            throw new NoticeBoardNotFoundException(0);
+
+        return noticeBoards;
     }
 }

@@ -39,13 +39,6 @@ public class UserDao {
     @JsonIgnore
     private Set<Role> roles;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "USER_NOTICEBOARD", joinColumns = {
-            @JoinColumn(name = "USER_ID") }, inverseJoinColumns = {
-            @JoinColumn(name = "NOTICEBOARD_ID") })
-    @JsonIgnore
-    private Set<NoticeBoard> noticeBoard;
-
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true
     )
@@ -71,7 +64,7 @@ public class UserDao {
     @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dorm_id")
     @JsonIgnore
     private Dorm dorm;
@@ -127,15 +120,6 @@ public class UserDao {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-
-    public Set<NoticeBoard> getNoticeBoard() {
-        return noticeBoard;
-    }
-
-    public void setNoticeBoard(Set<NoticeBoard> noticeBoard) {
-        this.noticeBoard = noticeBoard;
     }
 
     public List<WashingReservation> getWashingReservations() {

@@ -58,11 +58,6 @@ public class UserController {
         return ResponseEntity.ok(userDetailsService.getRoles(userId));
     }
 
-    @GetMapping("/user/noticeBoards")
-    public ResponseEntity<?> getUserNoticeBoards(HttpServletRequest request){
-        return ResponseEntity.ok(userDetailsService.getNoticeBoard(request));
-    }
-
     @PostMapping("/user/{userId}/role/{roleId}")
     public ResponseEntity<?> setRoleToUser(@PathVariable long userId, @PathVariable long roleId){
         return ResponseEntity.ok(roleService.setRoleToRole(userId,roleId));

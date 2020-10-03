@@ -30,10 +30,12 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JsonIgnore
     private UserDao user;
 
     @ManyToOne
     @JoinColumn(name = "noticeBoard_id",referencedColumnName = "id")
+    @JsonIgnore
     private NoticeBoard noticeBoard;
 
     @OneToMany(cascade = CascadeType.ALL,
@@ -41,6 +43,15 @@ public class Post {
     @JoinColumn(name = "post_id")
     @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
+
+    public Post(){
+
+    }
+    public Post(long id,String title,String text){
+        this.id=id;
+        this.title=title;
+        this.text=text;
+    }
 
     public long getId(){
         return id;

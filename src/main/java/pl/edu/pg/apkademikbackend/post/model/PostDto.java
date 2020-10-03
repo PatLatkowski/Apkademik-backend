@@ -8,10 +8,15 @@ public class PostDto {
     private  String text;
     private LocalDateTime date;
     private  String author;
-    private Integer room;
+    private String room;
     private boolean isAuthor;
+    private  long noticeBoardId;
+    private  long userId;
 
-    public PostDto(Long id, String title,String text,LocalDateTime date,String authorName,String authorSurname,Integer room){
+    public PostDto(){
+    }
+
+    public PostDto(Long id, String title,String text,LocalDateTime date,String authorName,String authorSurname,String room){
         this.id=id;
         this.title=title;
         this.text=text;
@@ -56,14 +61,28 @@ public class PostDto {
         this.author=author;
     }
 
-    public Integer getRoom(){
+    public String getRoom(){
         return room;
     }
-    public void setRoom(Integer room){
+    public void setRoom(String room){
         this.room=room;
     }
 
     public boolean getIsAuthor(){return isAuthor;}
-
     public void setIsAuthor(boolean isAuthor){this.isAuthor=isAuthor;}
+
+    public long getNoticeBoardId() {
+        return noticeBoardId;
+    }
+    public void setNoticeBoardId(long noticeBoardId) {
+        this.noticeBoardId = noticeBoardId;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
 }

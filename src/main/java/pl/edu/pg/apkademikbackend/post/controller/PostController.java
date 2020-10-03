@@ -24,7 +24,7 @@ public class PostController {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @PostMapping("/noticeBoard/{noticeBoard}/post")
-    public ResponseEntity<?> addPost(@PathVariable String noticeBoard,@RequestBody Post newPost,HttpServletRequest request) throws Exception{
+    public ResponseEntity<?> addPost(@PathVariable String noticeBoard,@RequestBody PostDto newPost,HttpServletRequest request) throws Exception{
         String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
         if(userEmail==null)
             throw new UserNotFoundException(userEmail);
@@ -62,7 +62,7 @@ public class PostController {
     }
 
     @PutMapping("/post/{id}")
-    public ResponseEntity<?>updatePostById(@PathVariable long id, @RequestBody Post post){
+    public ResponseEntity<?>updatePostById(@PathVariable long id, @RequestBody PostDto post){
         return ResponseEntity.ok(postService.updatePostById(id,post));
     }
 

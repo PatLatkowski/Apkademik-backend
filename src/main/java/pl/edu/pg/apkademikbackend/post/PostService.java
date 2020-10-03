@@ -11,6 +11,8 @@ import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.post.model.PostDto;
 import pl.edu.pg.apkademikbackend.post.repository.PostRepository;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
+import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
+import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,26 +35,31 @@ public class PostService {
 
     }
 
-    public Post savePost(Post newPost,String noticeBoard, String userEmail){
-        LocalDateTime date=LocalDateTime.now();
-        newPost.setDate(date);
-
-        newPost.setUser(jwtUserDetailsService.getUser(userEmail));
+    public List<Post> savePost(PostDto newPost,String noticeBoard, String userEmail){
+        UserDao user=jwtUserDetailsService.getUser(userEmail);
+        if(user==null)
+            throw new UserNotFoundException(userEmail);
 
         NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
-        newPost.setNoticeBoard(testNoticeBoard);
-
         Integer countPosts= postRepository.countPosts(testNoticeBoard.getId());
 
-        newPost.setPage(countPosts/10);
-        List<Post> posts=testNoticeBoard.getPosts();
-        posts.add(newPost);
-        postRepository.save(newPost);
+        Post post=new Post();
 
-        return newPost;
+        LocalDateTime date=LocalDateTime.now();
+        post.setDate(date);
+        post.setPage(countPosts/10);
+        post.setUser(user);
+        post.setNoticeBoard(testNoticeBoard);
+        post.setText(newPost.getText());
+        post.setTitle(newPost.getTitle());
+
+        List<Post> posts=testNoticeBoard.getPosts();
+        posts.add(post);
+        postRepository.save(post);
+        return posts;
     }
 
     public List<PostDto> getPosts(String noticeBoard){
@@ -123,7 +130,7 @@ public class PostService {
         return post;
     }
 
-    public Post updatePostById(long id, Post newPost){
+    public Post updatePostById(long id, PostDto newPost){
         Post post = postRepository.findById(id);
         if(post == null)
             throw new PostNotFoundException(id);
@@ -143,7 +150,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private PostDto returnPostData(Post post){
+    public PostDto returnPostData(Post post){
         PostDto postDto=new PostDto(post.getId(),post.getTitle(),post.getText(),post.getDate(),post.getUser().getName(),post.getUser().getSurname(),post.getUser().getRoom().getNumber());
         return postDto;
     }

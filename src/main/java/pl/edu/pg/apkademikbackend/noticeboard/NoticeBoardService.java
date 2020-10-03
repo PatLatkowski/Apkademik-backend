@@ -8,6 +8,7 @@ import pl.edu.pg.apkademikbackend.dorm.model.Dorm;
 import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardAlreadyExistException;
 import pl.edu.pg.apkademikbackend.noticeboard.exception.NoticeBoardNotFoundException;
 import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
+import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoardDto;
 import pl.edu.pg.apkademikbackend.noticeboard.repository.NoticeBoardRepository;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
 
@@ -17,19 +18,38 @@ import java.util.List;
 @Component
 public class NoticeBoardService {
 
-    @Autowired
-    private  NoticeBoardRepository noticeBoardRepository;
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
-    @Autowired
-    private DormService dormService;
 
+    private final NoticeBoardRepository noticeBoardRepository;
 
-    public NoticeBoard saveNoticeBoard(NoticeBoard noticeBoard){
-        NoticeBoard newNoticeBoard = noticeBoardRepository.findByName(noticeBoard.getName());
-        if(newNoticeBoard != null)
-            throw new NoticeBoardAlreadyExistException(noticeBoard.getName());
-        return noticeBoardRepository.save(noticeBoard);
+    private final JwtUserDetailsService jwtUserDetailsService;
+
+    private final DormService dormService;
+
+@Autowired
+public NoticeBoardService(NoticeBoardRepository noticeBoardRepository,JwtUserDetailsService jwtUserDetailsService,DormService dormService){
+    this.noticeBoardRepository=noticeBoardRepository;
+    this.jwtUserDetailsService=jwtUserDetailsService;
+    this.dormService=dormService;
+}
+
+    public List<NoticeBoard> saveNoticeBoard(NoticeBoardDto newNoticeBoard){
+        Dorm dorm = dormService.getDormById(newNoticeBoard.getDormId());
+        if(dorm==null)
+            throw new DormNotFoundException(newNoticeBoard.getDormId());
+
+        List<NoticeBoard> noticeBoards=dorm.getNoticeBoards();
+        if(newNoticeBoard.getName() == null)
+            throw new NoticeBoardNotFoundException(null);
+        if(noticeBoards.stream().anyMatch(noticeBoard1->noticeBoard1.getName()== newNoticeBoard.getName()))
+            throw new NoticeBoardAlreadyExistException(newNoticeBoard.getName());
+
+        NoticeBoard noticeBoard=new NoticeBoard();
+        noticeBoard.setName(newNoticeBoard.getName());
+        noticeBoard.setDorm(dorm);
+        noticeBoards.add(noticeBoard);
+        dorm.setNoticeBoards(noticeBoards);
+        noticeBoardRepository.save(noticeBoard);
+        return noticeBoards;
     }
 
 
@@ -48,12 +68,10 @@ public class NoticeBoardService {
     }
 
 
-    public NoticeBoard updateNoticeBoardById(long id, NoticeBoard newNoticeBoard){
+    public NoticeBoard updateNoticeBoardById(long id, NoticeBoardDto newNoticeBoard){
         NoticeBoard noticeBoard = noticeBoardRepository.findById(id);
         if(noticeBoard == null)
             throw new NoticeBoardNotFoundException(id);
-        if(newNoticeBoard.getName()!=null)
-            noticeBoard.setName(newNoticeBoard.getName());
         if(newNoticeBoard.getName()!=null)
             noticeBoard.setName(newNoticeBoard.getName());
         return noticeBoardRepository.save(noticeBoard);
@@ -66,12 +84,10 @@ public class NoticeBoardService {
         noticeBoardRepository.delete(noticeBoard);
     }
 
-    public boolean amImemberOfNoticeBoard(String noticeBoardName,HttpServletRequest request){
+    public boolean amImemberOfNoticeBoard(String noticeBoardName,String userEmail){
         NoticeBoard testNoticeBoard=getNoticeBoardByName(noticeBoardName);
         if(testNoticeBoard==null)
             throw new NoticeBoardNotFoundException(noticeBoardName);
-
-        String userEmail=jwtUserDetailsService.getUserEmailFromToken(request);
 
         Dorm dorm =dormService.getDormByUserEmail(userEmail);
         if(dorm==null)

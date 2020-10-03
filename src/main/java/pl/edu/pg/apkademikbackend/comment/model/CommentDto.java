@@ -10,6 +10,11 @@ public class CommentDto {
     private LocalDateTime date;
     private  String author;
     private boolean isAuthor;
+    private long userId;
+    private long postId;
+
+    public CommentDto(){
+    }
 
     public CommentDto(Long id, String text,LocalDateTime date,String authorName,String authorSurname){
         this.id=id;
@@ -46,8 +51,22 @@ public class CommentDto {
     public void setAuthor(String author){
         this.author=author;
     }
-    public boolean getIsAuthor(){return isAuthor;}
 
+    public boolean getIsAuthor(){return isAuthor;}
     public void setIsAuthor(boolean isAuthor){this.isAuthor=isAuthor;}
+
+    public long getUserId(){
+        return userId;
+    }
+    public void setUserId(long userId){
+        this.userId=userId;
+    }
+
+    public long getPostId(){
+        return postId;
+    }
+    public void setPostId(long postId){
+        this.postId=postId;
+    }
 }
 

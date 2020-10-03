@@ -36,7 +36,7 @@ public class CommentController {
 
 
     @PostMapping("/post/{postId}/comment")
-    public ResponseEntity<?> addComment(@PathVariable long postId, @RequestBody Comment newComment, HttpServletRequest request) throws Exception{
+    public ResponseEntity<?> addComment(@PathVariable long postId, @RequestBody CommentDto newComment, HttpServletRequest request) throws Exception{
         String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
         if(userEmail==null)
             throw new UserNotFoundException(userEmail);
@@ -59,7 +59,7 @@ public class CommentController {
     }
 
     @PutMapping("/comment/{id}")
-    public ResponseEntity<?>updateCommentById(@PathVariable long id, @RequestBody Comment comment){
+    public ResponseEntity<?>updateCommentById(@PathVariable long id, @RequestBody CommentDto comment){
         return ResponseEntity.ok(commentService.updateCommentById(id,comment));
     }
 

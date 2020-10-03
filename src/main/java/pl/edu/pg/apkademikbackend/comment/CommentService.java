@@ -14,6 +14,7 @@ import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.post.model.PostDto;
 import pl.edu.pg.apkademikbackend.post.repository.PostRepository;
 import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
+import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 import pl.edu.pg.apkademikbackend.user.repositry.UserRepository;
 import pl.edu.pg.apkademikbackend.washingReservation.exception.WashingReservationNotFoundException;
@@ -39,21 +40,26 @@ public class CommentService {
         this.postService=postService;
     }
 
-    public Comment saveComment(Comment newComment, long postId, String userEmail){
-        LocalDateTime date=LocalDateTime.now();
-        newComment.setDate(date);
-
-        newComment.setUser(jwtUserDetailsService.getUser(userEmail));
+    public List<Comment> saveComment(CommentDto newComment, long postId, String userEmail){
+        UserDao user=jwtUserDetailsService.getUser(userEmail);
+        if(user==null)
+            throw new UserNotFoundException(userEmail);
 
         Post post=postService.getPostById(postId);
         if(post==null)
             throw new PostNotFoundException(postId);
 
-        newComment.setPost(post);
         List<Comment> comments=post.getComments();
-        comments.add(newComment);
-        commentRepository.save(newComment);
-        return newComment;
+        Comment comment=new Comment();
+        LocalDateTime date=LocalDateTime.now();
+        comment.setDate(date);
+        comment.setUser(user);
+        comment.setPost(post);
+        comment.setText(newComment.getText());
+
+        comments.add(comment);
+        commentRepository.save(comment);
+        return comments;
     }
 
     public List<CommentDto> getComments(long postId,String userEmail){
@@ -68,7 +74,7 @@ public class CommentService {
         for (Comment comment:comments ) {
             CommentDto newComment=returnCommentData(comment);
 
-            if(comment.getUsers()==thisUser)
+            if(comment.getUser()==thisUser)
                 newComment.setIsAuthor(true);
             commentsData.add(newComment);
         }
@@ -84,7 +90,7 @@ public class CommentService {
         return comment;
     }
 
-    public Comment updateCommentById(long id, Comment newComment){
+    public Comment updateCommentById(long id, CommentDto newComment){
         Comment comment = commentRepository.findById(id);
         if(comment == null)
             throw new WashingReservationNotFoundException(id);
@@ -102,8 +108,8 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    private CommentDto returnCommentData(Comment comment){
-        CommentDto newComment=new CommentDto(comment.getId(),comment.getText(),comment.getDate(),comment.getUsers().getName(),comment.getUsers().getSurname());
+    public CommentDto returnCommentData(Comment comment){
+        CommentDto newComment=new CommentDto(comment.getId(),comment.getText(),comment.getDate(),comment.getUser().getName(),comment.getUser().getSurname());
         return newComment;
     }
 

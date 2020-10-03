@@ -1,13 +1,10 @@
 package pl.edu.pg.apkademikbackend.post.repository;
 
-import javafx.geometry.Pos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pl.edu.pg.apkademikbackend.post.model.Post;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post,Integer> {

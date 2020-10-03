@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pg.apkademikbackend.noticeboard.NoticeBoardService;
-import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoard;
+import pl.edu.pg.apkademikbackend.noticeboard.model.NoticeBoardDto;
 import pl.edu.pg.apkademikbackend.noticeboard.repository.NoticeBoardRepository;
+import pl.edu.pg.apkademikbackend.user.JwtUserDetailsService;
+import pl.edu.pg.apkademikbackend.user.exception.UserNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,8 +21,11 @@ public class NoticeBoardController {
     @Autowired
     NoticeBoardService noticeBoardService;
 
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
+
     @PostMapping("/noticeBoard")
-    public ResponseEntity<?> addNoticeBoard(@RequestBody NoticeBoard noticeBoard){
+    public ResponseEntity<?> addNoticeBoard(@RequestBody NoticeBoardDto noticeBoard){
         return ResponseEntity.ok(noticeBoardService.saveNoticeBoard(noticeBoard));
     }
 
@@ -30,7 +35,7 @@ public class NoticeBoardController {
     }
 
     @PutMapping("/noticeBoard/{id}")
-    public ResponseEntity<?>updateCommonSpaceById(@PathVariable long id, @RequestBody NoticeBoard noticeBoard){
+    public ResponseEntity<?>updateCommonSpaceById(@PathVariable long id, @RequestBody NoticeBoardDto noticeBoard){
         return ResponseEntity.ok(noticeBoardService.updateNoticeBoardById(id,noticeBoard));
     }
 
@@ -42,7 +47,10 @@ public class NoticeBoardController {
 
     @GetMapping("/noticeBoard/{noticeBoard}/member")
     public ResponseEntity<?>amIMemberOfNoticeBoard(@PathVariable String noticeBoard, HttpServletRequest request){
-        return ResponseEntity.ok(noticeBoardService.amImemberOfNoticeBoard(noticeBoard,request));
+        String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
+        if(userEmail==null)
+            throw new UserNotFoundException(userEmail);
+        return ResponseEntity.ok(noticeBoardService.amImemberOfNoticeBoard(noticeBoard,userEmail));
     }
 
 }

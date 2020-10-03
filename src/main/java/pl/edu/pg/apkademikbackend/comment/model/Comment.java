@@ -1,6 +1,7 @@
 package pl.edu.pg.apkademikbackend.comment.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.edu.pg.apkademikbackend.post.model.Post;
 import pl.edu.pg.apkademikbackend.user.model.UserDao;
 
@@ -20,12 +21,22 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id",referencedColumnName = "id")
+    @JsonIgnore
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JsonIgnore
     private UserDao user;
 
+    public Comment(){
+
+    }
+    public Comment(long id,String text,LocalDateTime date){
+        this.id=id;
+        this.text=text;
+        this.date=date;
+    }
 
     public long getId(){
         return id;
@@ -55,14 +66,11 @@ public class Comment {
         this.post=post;
     }
 
-    public UserDao getUsers(){
+    public UserDao getUser(){
         return user;
     }
     public void setUser(UserDao user){
         this.user=user;
     }
 
-    public UserDao getUser() {
-        return user;
-    }
 }

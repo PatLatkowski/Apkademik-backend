@@ -18,7 +18,7 @@ public class NoticeBoard {
     @Column
     private  String name;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "dorm_id",referencedColumnName = "id")
     @JsonIgnore
     private Dorm dorm;

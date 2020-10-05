@@ -61,17 +61,17 @@ public class PostServiceTests {
         post.setNoticeBoard(noticeBoard2);
         UserDao user=new UserDao();
         when(postRepository.findById(post.getId())).thenReturn(post);
-        when(noticeBoardService.getNoticeBoardByName(noticeBoard.getName())).thenReturn(noticeBoard);
-        Assert.assertThrows(PostNotOnThisNoticeBoardException.class,() -> postService.getPost(post.getId(),noticeBoard.getName(),user.getEmail()));
+        when(noticeBoardService.getNoticeBoardById(noticeBoard.getId())).thenReturn(noticeBoard);
+        Assert.assertThrows(PostNotOnThisNoticeBoardException.class,() -> postService.getPost(post.getId(),noticeBoard.getId(),user.getEmail()));
     }
 
     @Test
     void getPagesTest(){
         NoticeBoard noticeBoard=new NoticeBoard(1L,"test name");
-        when(noticeBoardService.getNoticeBoardByName(noticeBoard.getName())).thenReturn(noticeBoard);
+        when(noticeBoardService.getNoticeBoardById(noticeBoard.getId())).thenReturn(noticeBoard);
         when(postRepository.getPage(noticeBoard.getId())).thenReturn(5);
 
-        Integer page = postService.getPages(noticeBoard.getName());
+        Integer page = postService.getPages(noticeBoard.getId());
         assertEquals(page,5);
     }
 

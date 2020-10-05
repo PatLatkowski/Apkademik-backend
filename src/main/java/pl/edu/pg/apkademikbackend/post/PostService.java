@@ -35,12 +35,12 @@ public class PostService {
 
     }
 
-    public List<Post> savePost(PostDto newPost,String noticeBoard, String userEmail){
+    public List<Post> savePost(PostDto newPost,long noticeBoard, String userEmail){
         UserDao user=jwtUserDetailsService.getUser(userEmail);
         if(user==null)
             throw new UserNotFoundException(userEmail);
 
-        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardById(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -62,8 +62,8 @@ public class PostService {
         return posts;
     }
 
-    public List<PostDto> getPosts(String noticeBoard){
-        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
+    public List<PostDto> getPosts(long noticeBoard){
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardById(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -77,8 +77,8 @@ public class PostService {
         return postsData;
     }
 
-    public List<PostDto> getPostsFromPage(String noticeBoard,Integer page){
-        NoticeBoard testNoticeBoard=noticeBoardService.getNoticeBoardByName(noticeBoard);
+    public List<PostDto> getPostsFromPage(long noticeBoard,Integer page){
+        NoticeBoard testNoticeBoard=noticeBoardService.getNoticeBoardById(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 
@@ -92,11 +92,11 @@ public class PostService {
         return postsData;
     }
 
-    public PostDto getPost(long id,String noticeBoard, String userEmail ){
+    public PostDto getPost(long id,long noticeBoardId, String userEmail ){
 
-        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardById(noticeBoardId);
         if(testNoticeBoard == null)
-            throw new NoticeBoardNotFoundException(noticeBoard);
+            throw new NoticeBoardNotFoundException(noticeBoardId);
 
         Post post=postRepository.findById(id);
         if(post==null)
@@ -104,7 +104,7 @@ public class PostService {
 
 
         if(post.getNoticeBoard().getId()!=testNoticeBoard.getId())
-            throw new PostNotOnThisNoticeBoardException(id,noticeBoard);
+            throw new PostNotOnThisNoticeBoardException(id,noticeBoardId);
 
         PostDto postDto=returnPostData(post);
 
@@ -115,8 +115,8 @@ public class PostService {
 
     }
 
-    public Integer getPages(String noticeBoard){
-        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardByName(noticeBoard);
+    public Integer getPages(long noticeBoard){
+        NoticeBoard testNoticeBoard= noticeBoardService.getNoticeBoardById(noticeBoard);
         if(testNoticeBoard == null)
             throw new NoticeBoardNotFoundException(noticeBoard);
 

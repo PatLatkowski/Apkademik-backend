@@ -24,7 +24,7 @@ public class PostController {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @PostMapping("/noticeBoard/{noticeBoard}/post")
-    public ResponseEntity<?> addPost(@PathVariable String noticeBoard,@RequestBody PostDto newPost,HttpServletRequest request) throws Exception{
+    public ResponseEntity<?> addPost(@PathVariable long noticeBoard,@RequestBody PostDto newPost,HttpServletRequest request) throws Exception{
         String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
         if(userEmail==null)
             throw new UserNotFoundException(userEmail);
@@ -33,27 +33,27 @@ public class PostController {
     }
 
     @GetMapping("/noticeBoard/{noticeBoard}/posts")
-    public ResponseEntity<?> getPosts(@PathVariable String noticeBoard)  throws Exception{
+    public ResponseEntity<?> getPosts(@PathVariable long noticeBoard)  throws Exception{
         return ResponseEntity.ok(postService.getPosts(noticeBoard));
     }
 
     @GetMapping("/noticeBoard/{noticeBoard}/pages")
-    public ResponseEntity<?> getPages(@PathVariable String noticeBoard)  throws Exception{
+    public ResponseEntity<?> getPages(@PathVariable long noticeBoard)  throws Exception{
         return ResponseEntity.ok(postService.getPages(noticeBoard));
     }
 
-    @GetMapping("/noticeBoard/{noticeBoard}/page={page}")
-    public List<PostDto> getPostsFromPage(@PathVariable String noticeBoard, @PathVariable Integer page)  throws Exception{
-        return postService.getPostsFromPage(noticeBoard,page);
+    @GetMapping("/noticeBoard/{noticeBoardId}/page={page}")
+    public List<PostDto> getPostsFromPage(@PathVariable long noticeBoardId, @PathVariable Integer page)  throws Exception{
+        return postService.getPostsFromPage(noticeBoardId,page);
     }
 
-    @GetMapping("/noticeBoard/{noticeBoard}/post/{id}")
-    public ResponseEntity<?> getPost(@PathVariable long id,@PathVariable String noticeBoard,HttpServletRequest request)  throws Exception{
+    @GetMapping("/noticeBoard/{noticeBoardId}/post/{id}")
+    public ResponseEntity<?> getPost(@PathVariable long id,@PathVariable long noticeBoardId,HttpServletRequest request)  throws Exception{
         String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
         if(userEmail==null)
             throw new UserNotFoundException(userEmail);
 
-        return ResponseEntity.ok(postService.getPost(id,noticeBoard,userEmail));
+        return ResponseEntity.ok(postService.getPost(id,noticeBoardId,userEmail));
     }
 
     @GetMapping("/post/{id}")

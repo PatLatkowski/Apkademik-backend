@@ -1,7 +1,7 @@
 package pl.edu.pg.apkademikbackend.post.exception;
 
 public class PostNotOnThisNoticeBoardException extends RuntimeException{
-    public PostNotOnThisNoticeBoardException(long post,String noticeBoardName){
-        super("Post: "+post +" not found on noticeBoard: "+noticeBoardName);
+    public PostNotOnThisNoticeBoardException(long post,long noticeBoard){
+        super("Post: "+post +" not found on noticeBoard: "+noticeBoard);
     }
 }

@@ -84,10 +84,10 @@ public NoticeBoardService(NoticeBoardRepository noticeBoardRepository,JwtUserDet
         noticeBoardRepository.delete(noticeBoard);
     }
 
-    public boolean amImemberOfNoticeBoard(String noticeBoardName,String userEmail){
-        NoticeBoard testNoticeBoard=getNoticeBoardByName(noticeBoardName);
+    public boolean amImemberOfNoticeBoard(long id,String userEmail){
+        NoticeBoard testNoticeBoard=getNoticeBoardById(id);
         if(testNoticeBoard==null)
-            throw new NoticeBoardNotFoundException(noticeBoardName);
+            throw new NoticeBoardNotFoundException(id);
 
         Dorm dorm =dormService.getDormByUserEmail(userEmail);
         if(dorm==null)

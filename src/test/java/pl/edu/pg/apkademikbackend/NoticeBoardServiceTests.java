@@ -84,10 +84,10 @@ public class NoticeBoardServiceTests {
         Dorm dorm =new Dorm();
         dorm.setNoticeBoards(noticeBoardList);
 
-        when(noticeBoardRepository.findByName(noticeBoard.getName())).thenReturn(noticeBoard);
+        when(noticeBoardRepository.findById(noticeBoard.getId())).thenReturn(noticeBoard);
         when(dormService.getDormByUserEmail(user.getEmail())).thenReturn(dorm);
 
-        Boolean amIMemeberOfNoticeBoard=noticeBoardService.amImemberOfNoticeBoard(noticeBoard.getName(),user.getEmail());
+        Boolean amIMemeberOfNoticeBoard=noticeBoardService.amImemberOfNoticeBoard(noticeBoard.getId(),user.getEmail());
         assertEquals(amIMemeberOfNoticeBoard,true);
     }
 

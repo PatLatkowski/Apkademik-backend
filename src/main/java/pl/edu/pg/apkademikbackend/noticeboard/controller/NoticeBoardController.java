@@ -45,12 +45,12 @@ public class NoticeBoardController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/noticeBoard/{noticeBoard}/member")
-    public ResponseEntity<?>amIMemberOfNoticeBoard(@PathVariable String noticeBoard, HttpServletRequest request){
+    @GetMapping("/noticeBoard/{id}/member")
+    public ResponseEntity<?>amIMemberOfNoticeBoard(@PathVariable long id, HttpServletRequest request){
         String userEmail= jwtUserDetailsService.getUserEmailFromToken(request);
         if(userEmail==null)
             throw new UserNotFoundException(userEmail);
-        return ResponseEntity.ok(noticeBoardService.amImemberOfNoticeBoard(noticeBoard,userEmail));
+        return ResponseEntity.ok(noticeBoardService.amImemberOfNoticeBoard(id,userEmail));
     }
 
 }
